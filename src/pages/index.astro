@@ -4,8 +4,8 @@ import Navbar from '../components/Navbar.astro';
 import Button from '../components/Button.astro';
 import TrustedBy from '../components/TrustedBy.astro';
 import VideoCard from '../components/VideoCard.astro';
+import { cldImage } from '../lib/cloudinary';
 
-// ── Data ──────────────────────────────────────────
 const isReelReady = false;
 
 const navLinks = [
@@ -31,48 +31,48 @@ const videos = [
     id: 'v1',
     title: 'Urban Pulse',
     category: 'Commercial',
-    src: '',
-    poster: '/posters/poster-1.svg',
+    playbackId: '',                         // TODO: Mux playback ID
+    poster: cldImage('poster-1'),           // DG_port/poster-1
     meta: '4K • ANAMORPHIC • 2024',
   },
   {
     id: 'v2',
     title: 'Quiet Hours',
     category: 'Interview',
-    src: '',
-    poster: '/posters/poster-2.svg',
+    playbackId: '',
+    poster: cldImage('poster-2'),
     meta: '4K • SPHERICAL • 2024',
   },
   {
     id: 'v3',
     title: 'Chromatic Drift',
     category: 'Art',
-    src: '',
-    poster: '/posters/poster-3.svg',
+    playbackId: '',
+    poster: cldImage('poster-3'),
     meta: '6K • ANAMORPHIC • 2023',
   },
   {
     id: 'v4',
     title: 'Grid & Grain',
     category: 'Social',
-    src: '',
-    poster: '/posters/poster-4.svg',
+    playbackId: '',
+    poster: cldImage('poster-4'),
     meta: '4K • SPHERICAL • 2024',
   },
   {
     id: 'v5',
     title: 'The Long Road',
     category: 'Narrative',
-    src: '',
-    poster: '/posters/poster-5.svg',
+    playbackId: '',
+    poster: cldImage('poster-5'),
     meta: '4K • ANAMORPHIC • 2023',
   },
   {
     id: 'v6',
     title: 'Signal & Noise',
     category: 'Commercial',
-    src: '',
-    poster: '/posters/poster-6.svg',
+    playbackId: '',
+    poster: cldImage('poster-6'),
     meta: '4K • SPHERICAL • 2024',
   },
 ];
@@ -212,7 +212,7 @@ const INITIAL_VISIBLE = 4;
               aria-hidden="true"
             ></div>
             <img
-              src="/portrait.svg"
+              src={cldImage('portrait', { width: 600 })}
               alt="Daniel Gualdron, Director of Photography"
               width="600"
               height="750"
@@ -283,7 +283,7 @@ const INITIAL_VISIBLE = 4;
                 id={v.id}
                 title={v.title}
                 category={v.category}
-                src={v.src}
+                playbackId={v.playbackId}
                 poster={v.poster}
                 meta={v.meta}
                 hidden={i >= INITIAL_VISIBLE}

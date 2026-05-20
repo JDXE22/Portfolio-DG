@@ -3,13 +3,15 @@ interface Props {
   id: string;
   title: string;
   category: string;
-  src: string;
+  playbackId: string;
   poster: string;
   meta: string;
   hidden?: boolean;
 }
 
-const { id, title, category, src, poster, meta, hidden = false } = Astro.props;
+const { id, title, category, playbackId, poster, meta, hidden = false } = Astro.props;
+
+const resolvedPoster = poster || (playbackId ? `https://image.mux.com/${playbackId}/thumbnail.jpg` : '');
 ---
 
 <article
@@ -27,18 +29,30 @@ const { id, title, category, src, poster, meta, hidden = false } = Astro.props;
     aria-hidden="true"
   ></div>
 
-  <!-- Video -->
-  <video
-    class="w-full aspect-video object-cover block"
-    src={src}
-    poster={poster}
-    muted
-    playsinline
-    preload="none"
-    tabindex="-1"
-    aria-label={title}
-    data-video
-  ></video>
+  <!-- Video / Poster -->
+  {playbackId ? (
+    <mux-player
+      class="w-full aspect-video block"
+      playback-id={playbackId}
+      poster={resolvedPoster}
+      muted
+      playsinline
+      preload="none"
+      stream-type="on-demand"
+      tabindex="-1"
+      aria-label={title}
+      data-video
+      style="--controls: none; --media-object-fit: cover;"
+    ></mux-player>
+  ) : (
+    <img
+      class="w-full aspect-video object-cover block"
+      src={resolvedPoster}
+      alt={title}
+      loading="lazy"
+      aria-hidden="true"
+    />
+  )}
 
   <!-- Overlay info -->
   <div
@@ -57,14 +71,20 @@ const { id, title, category, src, poster, meta, hidden = false } = Astro.props;
 </article>
 
 <script>
+  import '@mux/mux-player';
+
   document.querySelectorAll<HTMLElement>('.video-card').forEach((card) => {
     const video = card.querySelector<HTMLVideoElement>('[data-video]');
     const skeleton = card.querySelector<HTMLElement>('[data-skeleton]');
 
-    if (!video) return;
+    if (!video) {
+      // No video — hide skeleton immediately
+      if (skeleton) skeleton.style.opacity = '0';
+      return;
+    }
 
-    // Hide skeleton when video data is ready
-    video.addEventListener('loadeddata', () => {
+    // Hide skeleton when media is ready
+    video.addEventListener('canplay', () => {
       if (skeleton) skeleton.style.opacity = '0';
     });
 
@@ -72,9 +92,7 @@ const { id, title, category, src, poster, meta, hidden = false } = Astro.props;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     card.addEventListener('mouseenter', () => {
-      if (!prefersReduced) {
-        video.play().catch(() => {});
-      }
+      if (!prefersReduced) video.play().catch(() => {});
     });
 
     card.addEventListener('mouseleave', () => {
@@ -83,9 +101,7 @@ const { id, title, category, src, poster, meta, hidden = false } = Astro.props;
     });
 
     card.addEventListener('focusin', () => {
-      if (!prefersReduced) {
-        video.play().catch(() => {});
-      }
+      if (!prefersReduced) video.play().catch(() => {});
     });
 
     card.addEventListener('focusout', () => {
