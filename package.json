@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@mux/mux-player": "^3.13.0",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.1",
     "better-sqlite3": "^12.10.0",
