@@ -1,0 +1,96 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  category: string;
+  src: string;
+  poster: string;
+  meta: string;
+  hidden?: boolean;
+}
+
+const { id, title, category, src, poster, meta, hidden = false } = Astro.props;
+---
+
+<article
+  class="video-card relative rounded-lg overflow-hidden ghost-border cursor-pointer group"
+  data-id={id}
+  data-category={category}
+  data-hidden={hidden ? 'true' : 'false'}
+  style="background: var(--color-surface-container-lowest);"
+  aria-label={`${title} — ${category}`}
+>
+  <!-- Skeleton placeholder -->
+  <div
+    class="skeleton absolute inset-0 z-10 rounded-lg transition-opacity duration-500"
+    data-skeleton
+    aria-hidden="true"
+  ></div>
+
+  <!-- Video -->
+  <video
+    class="w-full aspect-video object-cover block"
+    src={src}
+    poster={poster}
+    muted
+    playsinline
+    preload="none"
+    tabindex="-1"
+    aria-label={title}
+    data-video
+  ></video>
+
+  <!-- Overlay info -->
+  <div
+    class="absolute bottom-0 left-0 right-0 p-4 z-20"
+    style="background: linear-gradient(to top, color-mix(in srgb, var(--color-surface-container-lowest) 90%, transparent), transparent);"
+  >
+    <p
+      class="text-xs uppercase tracking-widest mb-1"
+      style="color: var(--color-primary); letter-spacing: 0.15em;"
+    >
+      {category}
+    </p>
+    <h3 class="font-display text-sm font-semibold text-on-surface leading-snug">{title}</h3>
+    <p class="text-xs mt-1" style="color: var(--color-on-surface-variant);">{meta}</p>
+  </div>
+</article>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.video-card').forEach((card) => {
+    const video = card.querySelector<HTMLVideoElement>('[data-video]');
+    const skeleton = card.querySelector<HTMLElement>('[data-skeleton]');
+
+    if (!video) return;
+
+    // Hide skeleton when video data is ready
+    video.addEventListener('loadeddata', () => {
+      if (skeleton) skeleton.style.opacity = '0';
+    });
+
+    // Hover play / pause (respects prefers-reduced-motion)
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    card.addEventListener('mouseenter', () => {
+      if (!prefersReduced) {
+        video.play().catch(() => {});
+      }
+    });
+
+    card.addEventListener('mouseleave', () => {
+      video.pause();
+      video.currentTime = 0;
+    });
+
+    card.addEventListener('focusin', () => {
+      if (!prefersReduced) {
+        video.play().catch(() => {});
+      }
+    });
+
+    card.addEventListener('focusout', () => {
+      video.pause();
+      video.currentTime = 0;
+    });
+  });
+</script>
