@@ -1,16 +1,28 @@
 # Filmmaker Portfolio - Tasks
 
-- [ ] Install Tailwind CSS v4 and Astro Tailwind integration; update `astro.config.mjs` accordingly.
-- [ ] Add `src/styles/global.css` with `@import "tailwindcss"` and `@theme` tokens from DESIGN.md.
-- [ ] Update `src/layouts/Layout.astro` to load fonts, global CSS, and apply base body classes.
-- [ ] Create `Button.astro` with primary/secondary/tertiary variants and disabled state styling.
-- [ ] Create `Navbar.astro` with responsive layout and mobile toggle script.
-- [ ] Create `TrustedBy.astro` with a looping CSS marquee of logos.
-- [ ] Create `VideoCard.astro` with skeleton overlay, video markup, and data attributes.
-- [ ] Replace `src/pages/index.astro` content with the new single-page structure and sections.
-- [ ] Implement the preloader overlay and transition logic in `index.astro`.
-- [ ] Implement About section layout, grayscale hover portrait, and scroll cue.
-- [ ] Implement Cinematography filters, view-all toggle, and hover play/pause script.
-- [ ] Implement Contact section with mailto CTA and social icon links.
-- [ ] Add or replace placeholder assets (logos, portrait, poster frames) with correct alt text.
-- [ ] Run a quick accessibility pass: semantic landmarks, aria labels, focus states, reduced motion.
+- [x] Install Tailwind CSS v4 and Astro Tailwind integration; update `astro.config.mjs` accordingly.
+  - Used `@tailwindcss/vite` plugin (v4 CSS-first approach, no legacy config).
+- [x] Add `src/styles/global.css` with `@import "tailwindcss"` and `@theme` tokens from DESIGN.md.
+- [x] Update `src/layouts/Layout.astro` to load fonts, global CSS, and apply base body classes.
+  - CSS imported via frontmatter `import '../styles/global.css'` (Vite handles injection).
+  - Google Fonts: Manrope (display) + Inter (body) loaded via `<link>`.
+- [x] Create `Button.astro` with primary/secondary/tertiary variants and disabled state styling.
+- [x] Create `Navbar.astro` with responsive layout and mobile toggle script.
+  - Mobile menu uses `aria-controls`, `aria-expanded`, `aria-modal`; closes on Escape.
+- [x] Create `TrustedBy.astro` with a looping CSS marquee of logos.
+  - CSS-only using duplicated logo set + `animate-marquee` keyframe.
+- [x] Create `VideoCard.astro` with skeleton overlay, video markup, and data attributes.
+  - Skeleton hides on `loadeddata`; hover play respects `prefers-reduced-motion`.
+- [x] Replace `src/pages/index.astro` content with the new single-page structure and sections.
+- [x] Implement the preloader overlay and transition logic in `index.astro`.
+  - Respects `prefers-reduced-motion` (instant dismiss when reduced motion preferred).
+- [x] Implement About section layout, grayscale hover portrait, and scroll cue.
+- [x] Implement Cinematography filters, view-all toggle, and hover play/pause script.
+  - Filters update `data-hidden` attribute driven by CSS rule `.video-card[data-hidden="true"] { display: none }`.
+- [x] Implement Contact section with mailto CTA and social icon links.
+- [x] Add or replace placeholder assets (logos, portrait, poster frames) with correct alt text.
+  - SVG placeholders in `public/logos/`, `public/posters/`, `public/portrait.svg`.
+- [x] Run a quick accessibility pass: semantic landmarks, aria labels, focus states, reduced motion.
+  - `<header>`, `<main>`, `<section>` with `aria-label`, `<footer role="contentinfo">`.
+  - All interactive elements have `focus-visible` outlines.
+  - Preloader, marquee, video hover all respect `prefers-reduced-motion`.
