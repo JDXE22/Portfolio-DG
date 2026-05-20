@@ -1,0 +1,76 @@
+---
+interface Props {
+  variant?: 'primary' | 'secondary' | 'tertiary';
+  href?: string;
+  disabled?: boolean;
+  class?: string;
+  type?: 'button' | 'submit';
+  label?: string;
+}
+
+const {
+  variant = 'primary',
+  href,
+  disabled = false,
+  class: extraClass = '',
+  type = 'button',
+  label,
+} = Astro.props;
+
+const base =
+  'inline-flex items-center gap-2 font-body text-sm font-medium transition-all duration-300 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+
+const variants = {
+  primary: `
+    px-6 py-3 rounded-sm
+    bg-gradient-to-br from-primary to-primary-container
+    text-surface
+    hover:opacity-90
+    disabled:opacity-40 disabled:cursor-not-allowed
+  `,
+  secondary: `
+    px-6 py-3 rounded-sm
+    border border-outline-variant/15
+    text-on-surface-variant
+    hover:bg-primary/10 hover:border-outline-variant/30
+    disabled:opacity-40 disabled:cursor-not-allowed
+  `,
+  tertiary: `
+    px-2 py-1
+    text-on-surface-variant
+    group
+    disabled:opacity-40 disabled:cursor-not-allowed
+  `,
+};
+
+const cls = `${base} ${variants[variant]} ${extraClass}`;
+const Tag = href ? 'a' : 'button';
+---
+
+{href ? (
+  <a
+    href={disabled ? undefined : href}
+    class={cls}
+    aria-disabled={disabled ? 'true' : undefined}
+    aria-label={label}
+    tabindex={disabled ? -1 : 0}
+  >
+    <slot />
+    {variant === 'tertiary' && (
+      <span class="inline-block transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+    )}
+  </a>
+) : (
+  <button
+    type={type}
+    class={cls}
+    disabled={disabled}
+    aria-disabled={disabled ? 'true' : undefined}
+    aria-label={label}
+  >
+    <slot />
+    {variant === 'tertiary' && (
+      <span class="inline-block transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true">→</span>
+    )}
+  </button>
+)}
