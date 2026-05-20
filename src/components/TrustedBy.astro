@@ -1,0 +1,33 @@
+---
+interface Logo {
+  name: string;
+  src: string;
+}
+
+interface Props {
+  logos: Logo[];
+}
+
+const { logos } = Astro.props;
+
+// Duplicate for seamless CSS marquee
+const doubled = [...logos, ...logos];
+---
+
+<div class="overflow-hidden" aria-label="Trusted by brands" role="region">
+  <div class="flex animate-marquee" style="width: max-content;">
+    {doubled.map((logo) => (
+      <div class="flex items-center justify-center px-10 shrink-0" style="height: 48px;">
+        <img
+          src={logo.src}
+          alt={logo.name}
+          width="80"
+          height="32"
+          loading="lazy"
+          class="object-contain opacity-40 hover:opacity-70 transition-opacity duration-500"
+          style="filter: brightness(0) invert(1);"
+        />
+      </div>
+    ))}
+  </div>
+</div>
