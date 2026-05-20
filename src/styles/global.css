@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Surfaces ──────────────────────────────── */
+  --color-surface: #0c1514;
+  --color-surface-container-lowest: #07100f;
+  --color-surface-container-low: #141d1c;
+  --color-surface-container: #1a2322;
+  --color-surface-container-high: #232c2b;
+  --color-surface-container-highest: #2a3433;
+  --color-surface-variant: #1a2322;
+
+  /* ── Outlines ──────────────────────────────── */
+  --color-outline-variant: #5b6b69;
+
+  /* ── Primary ───────────────────────────────── */
+  --color-primary: #abcec5;
+  --color-primary-container: #587972;
+
+  /* ── On-surface ────────────────────────────── */
+  --color-on-surface: #eef2f0;
+  --color-on-surface-variant: #c0c8c5;
+
+  /* ── Secondary ─────────────────────────────── */
+  --color-secondary-container: #2f3a38;
+  --color-on-secondary-container: #d0dad7;
+
+  /* ── Typography ────────────────────────────── */
+  --font-display: 'Manrope', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* ── Radii ──────────────────────────────────── */
+  --radius-sm: 0.125rem;
+  --radius-lg: 0.5rem;
+}
+
+/* ── Base ───────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-on-surface);
+}
+
+/* ── Marquee animation ──────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+/* ── Preloader ──────────────────────────────────── */
+@keyframes fadeScaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; pointer-events: none; }
+}
+
+#preloader {
+  animation: fadeScaleIn 0.8s ease-out forwards;
+}
+
+#preloader.done {
+  animation: fadeOut 0.7s ease-in forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #preloader { animation: none; }
+  #preloader.done { opacity: 0; pointer-events: none; }
+  .animate-marquee { animation-duration: 60s; }
+}
+
+/* ── Skeleton shimmer ───────────────────────────── */
+@keyframes shimmer {
+  from { background-position: -400px 0; }
+  to   { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-container-low) 25%,
+    var(--color-surface-container-high) 50%,
+    var(--color-surface-container-low) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite;
+}
+
+/* ── Ghost border (hover) ───────────────────────── */
+.ghost-border:hover {
+  outline: 1px solid color-mix(in srgb, var(--color-outline-variant) 15%, transparent);
+}
+
+/* ── Portrait hover ─────────────────────────────── */
+.portrait-img {
+  filter: grayscale(1);
+  transition: filter 600ms ease-out;
+}
+.portrait-img:hover {
+  filter: grayscale(0);
+}
+
+/* ── Video card ─────────────────────────────────── */
+.video-card[data-hidden="true"] {
+  display: none;
+}
+
+/* ── Filter pill active ─────────────────────────── */
+.filter-pill.active {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+  color: var(--color-surface);
+}
