@@ -2,6 +2,7 @@
 interface Logo {
   name: string;
   src: string;
+  width?: number;
 }
 
 interface Props {
@@ -17,12 +18,12 @@ const doubled = [...logos, ...logos];
 <div class="overflow-hidden" aria-label="Trusted by brands" role="region">
   <div class="flex animate-marquee" style="width: max-content;">
     {doubled.map((logo) => (
-      <div class="flex items-center justify-center px-10 shrink-0" style="height: 48px;">
+      <div class="flex items-center justify-center px-10 shrink-0" style="height: 64px;">
         <img
           src={logo.src}
           alt={logo.name}
-          width="80"
-          height="32"
+          width={logo.width ?? 120}
+          height="48"
           loading="lazy"
           class="object-contain opacity-40 hover:opacity-70 transition-opacity duration-500"
           style="filter: brightness(0) invert(1);"

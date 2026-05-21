@@ -62,27 +62,55 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Preloader ──────────────────────────────────── */
-@keyframes fadeScaleIn {
-  from { opacity: 0; transform: scale(0.94); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
 @keyframes fadeOut {
   from { opacity: 1; }
   to   { opacity: 0; pointer-events: none; }
 }
 
 #preloader {
-  animation: fadeScaleIn 0.8s ease-out forwards;
+  opacity: 1;
+}
+
+/* `both` applies `from` state before animation starts — prevents flash at opacity:1 */
+/* Initial hidden state — animation driven by JS (Web Animations API) */
+#preloader h1 {
+  opacity: 0;
+  transform: translateY(80px) scale(0.85);
+  will-change: opacity, transform;
 }
 
 #preloader.done {
-  animation: fadeOut 0.7s ease-in forwards;
+  animation: fadeOut 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ── Page reveal (center → up + down) ──────────── */
+@keyframes revealVertical {
+  from { clip-path: inset(50% 0 50% 0); }
+  to   { clip-path: inset(0% 0 0% 0); }
+}
+
+#page-wrap {
+  clip-path: inset(50% 0 50% 0);
+}
+
+#page-wrap.revealed {
+  animation: revealVertical 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Navbar hidden until reveal */
+body > header {
+  opacity: 0;
+}
+
+body > header.revealed {
+  transition: opacity 0.8s ease 0.3s;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #preloader { animation: none; }
   #preloader.done { opacity: 0; pointer-events: none; }
+  #page-wrap      { clip-path: none; }
+  body > header   { opacity: 1; }
   .animate-marquee { animation-duration: 60s; }
 }
 

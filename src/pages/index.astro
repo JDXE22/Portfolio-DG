@@ -16,12 +16,15 @@ const navLinks = [
 ];
 
 const logos = [
-  { name: 'Brand Alpha',   src: '/logos/brand-alpha.svg' },
-  { name: 'Brand Beta',    src: '/logos/brand-beta.svg' },
-  { name: 'Brand Gamma',   src: '/logos/brand-gamma.svg' },
-  { name: 'Brand Delta',   src: '/logos/brand-delta.svg' },
-  { name: 'Brand Epsilon', src: '/logos/brand-epsilon.svg' },
-  { name: 'Brand Zeta',    src: '/logos/brand-zeta.svg' },
+  { name: 'HoneyBaked', src: '/logos/HoneyBaked.svg' },
+  { name: 'Etihad',     src: '/logos/Etihad.svg' },
+  { name: 'Allstate',   src: '/logos/Allstate.svg',  width: 180 },
+  { name: 'Kroger',     src: '/logos/Kroger.svg' },
+  { name: 'Georgia',    src: '/logos/Georgia.svg',   width: 200 },
+  { name: 'OldSpice',   src: '/logos/OldSpice.svg' },
+  { name: 'Swiffer',    src: '/logos/Swiffer.svg' },
+  { name: 'Tide',       src: '/logos/Tide.svg' },
+  { name: 'PndG',       src: '/logos/PndG.svg' },
 ];
 
 const categories = ['All', 'Commercial', 'Interview', 'Art', 'Social', 'Narrative'];
@@ -99,6 +102,7 @@ const INITIAL_VISIBLE = 4;
   <!-- ── Navigation ────────────────────────────── -->
   <Navbar links={navLinks} />
 
+  <div id="page-wrap">
   <main id="main-content">
 
     <!-- ── Hero ─────────────────────────────────── -->
@@ -335,7 +339,7 @@ const INITIAL_VISIBLE = 4;
         <!-- Email CTA -->
         <Button
           variant="primary"
-          href="mailto:hello@danielgualdron.com"
+          href="mailto:gualdrondaniel@gmail.com"
           label="Email Daniel Gualdron"
         >
           Email Me
@@ -354,7 +358,7 @@ const INITIAL_VISIBLE = 4;
           </a>
           <div class="w-px h-4" style="background: var(--color-outline-variant);" aria-hidden="true"></div>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/daniel-gualdron-858063271"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Daniel Gualdron on LinkedIn (opens in new tab)"
@@ -369,6 +373,7 @@ const INITIAL_VISIBLE = 4;
 
   <!-- ── Footer ─────────────────────────────────── -->
   <footer
+    id="site-footer"
     role="contentinfo"
     class="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-4"
     style="background: var(--color-surface-container-lowest); border-top: 1px solid color-mix(in srgb, var(--color-outline-variant) 10%, transparent);"
@@ -380,28 +385,55 @@ const INITIAL_VISIBLE = 4;
       Director of Photography
     </p>
   </footer>
+  </div>{/* #page-wrap */}
 </Layout>
 
 <!-- ── Scripts ───────────────────────────────────── -->
 <script>
-  // Preloader
-  const preloader = document.getElementById('preloader');
+  const preloader  = document.getElementById('preloader');
+  const pageWrap   = document.getElementById('page-wrap');
+  const siteHeader = document.querySelector<HTMLElement>('body > header');
 
   if (preloader) {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const delay = prefersReduced ? 0 : 1800;
+    const nameEl = preloader.querySelector<HTMLElement>('h1');
+
+    if (nameEl) {
+      if (prefersReduced) {
+        // Reduced motion: plain fade, no transform
+        nameEl.animate(
+          [{ opacity: 0 }, { opacity: 1 }],
+          { duration: 800, easing: 'ease-out', fill: 'forwards' }
+        );
+      } else {
+        // Full cinematic reveal: rise + scale + fade over 4s
+        nameEl.animate(
+          [
+            { opacity: 0, transform: 'translateY(80px) scale(0.85)' },
+            { opacity: 1, transform: 'translateY(0px)  scale(1)'    },
+          ],
+          { duration: 4000, easing: 'ease-in-out', fill: 'forwards' }
+        );
+      }
+    }
+
+    const holdDelay = prefersReduced ? 1000 : 5500;
 
     setTimeout(() => {
       preloader.classList.add('done');
-      preloader.addEventListener('animationend', () => {
+
+      setTimeout(() => {
+        if (pageWrap)   pageWrap.classList.add('revealed');
+        if (siteHeader) siteHeader.classList.add('revealed');
+      }, prefersReduced ? 0 : 900);
+
+      preloader.addEventListener('animationend', (e) => {
+        if ((e as AnimationEvent).animationName !== 'fadeOut') return;
         preloader.remove();
       }, { once: true });
-      // Fallback for reduced motion
-      if (prefersReduced) preloader.remove();
-    }, delay);
+    }, holdDelay);
   }
 
-  // Category filters
   const filterGroup = document.getElementById('filter-group');
   const videoGrid = document.getElementById('video-grid');
 
@@ -412,7 +444,6 @@ const INITIAL_VISIBLE = 4;
 
       const filter = btn.dataset.filter ?? 'All';
 
-      // Update active pill
       filterGroup.querySelectorAll<HTMLButtonElement>('.filter-pill').forEach((pill) => {
         const isActive = pill === btn;
         pill.classList.toggle('active', isActive);
@@ -424,13 +455,11 @@ const INITIAL_VISIBLE = 4;
         }
       });
 
-      // Show/hide cards
       videoGrid.querySelectorAll<HTMLElement>('.video-card').forEach((card) => {
         const match = filter === 'All' || card.dataset.category === filter;
         card.dataset.hidden = match ? 'false' : 'true';
       });
 
-      // Reset view-all state on filter change
       const viewAllBtn = document.getElementById('view-all-btn');
       if (viewAllBtn) viewAllBtn.hidden = false;
     });
