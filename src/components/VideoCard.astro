@@ -23,6 +23,9 @@ const resolvedPoster =
   data-id={id}
   data-category={category}
   data-hidden={hidden ? 'true' : 'false'}
+  data-playback-id={playbackId}
+  data-title={title}
+  data-meta={meta}
   style="background: var(--color-surface-container-lowest);"
   aria-label={`${title} — ${category}`}
   role="button"
@@ -117,25 +120,29 @@ const resolvedPoster =
 
     // Keyboard: focusin/focusout are now reachable because the
     // article has tabindex="0" and role="button"
-    card.addEventListener('focusin', () => {
-      videoEl.play().catch(() => {});
-    });
+    // Click or keyboard → open modal
+    const openModal = () => {
+      const playbackId = card.dataset.playbackId;
+      if (!playbackId) return;
+      document.dispatchEvent(
+        new CustomEvent('video:open', {
+          detail: {
+            playbackId,
+            title: card.dataset.title ?? '',
+            meta: card.dataset.meta ?? '',
+            category: card.dataset.category ?? '',
+            rect: card.getBoundingClientRect(),
+          },
+        }),
+      );
+    };
 
-    card.addEventListener('focusout', () => {
-      videoEl.pause();
-      videoEl.currentTime = 0;
-    });
+    card.addEventListener('click', openModal);
 
-    // Allow Enter/Space to toggle play like a button
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        if (videoEl.paused) {
-          videoEl.play().catch(() => {});
-        } else {
-          videoEl.pause();
-          videoEl.currentTime = 0;
-        }
+        openModal();
       }
     });
   });

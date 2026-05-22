@@ -397,7 +397,87 @@ const INITIAL_VISIBLE = 4;
     </p>
   </footer>
   </div>{/* #page-wrap */}
+
+  <!-- ── Video Modal ──────────────────────────── -->
+  <div
+    id="video-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Video player"
+    class="fixed inset-0 z-80 hidden"
+  >
+    <!-- Backdrop -->
+    <div
+      id="modal-backdrop"
+      class="absolute inset-0"
+      style="background: rgba(4,4,4,0.9); opacity: 0;"
+    ></div>
+
+    <!-- Panel (this is what FLIP-animates) -->
+    <div
+      id="modal-inner"
+      class="absolute rounded-lg overflow-hidden"
+      style="top: 50%; left: 50%; width: min(90vw, 1100px); transform: translate(-50%, -50%); transform-origin: center center; opacity: 0;"
+    >
+      <!-- Close button -->
+      <button
+        id="modal-close"
+        aria-label="Close video"
+        class="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        style="background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); color: #fff; border: 1px solid rgba(255,255,255,0.12);"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- Mux player (controls visible by default) -->
+      <mux-player
+        id="modal-player"
+        class="w-full block"
+        stream-type="on-demand"
+        playsinline
+        preload="none"
+        style="aspect-ratio: 16/9; display: block; --media-object-fit: contain;"
+      ></mux-player>
+
+      <!-- Info bar -->
+      <div
+        class="px-5 py-4 flex items-baseline justify-between gap-4"
+        style="background: var(--color-surface-container-lowest);"
+      >
+        <div>
+          <p
+            id="modal-category"
+            class="text-xs uppercase tracking-widest mb-0.5"
+            style="color: var(--color-primary); letter-spacing: 0.15em;"
+          ></p>
+          <h3
+            id="modal-title"
+            class="font-display text-base font-semibold text-on-surface leading-snug"
+          ></h3>
+        </div>
+        <p
+          id="modal-meta"
+          class="text-xs shrink-0"
+          style="color: var(--color-on-surface-variant);"
+        ></p>
+      </div>
+    </div>
+  </div>
 </Layout>
+
+<!-- ── Global modal styles ───────────────────────── -->
+<style is:global>
+  #page-wrap {
+    transition: filter 0.35s ease;
+  }
+  #page-wrap.modal-open {
+    filter: blur(5px) brightness(0.35);
+    pointer-events: none;
+    user-select: none;
+  }
+</style>
 
 <!-- ── Scripts ───────────────────────────────────── -->
 <script>
@@ -411,13 +491,11 @@ const INITIAL_VISIBLE = 4;
 
     if (nameEl) {
       if (prefersReduced) {
-        // Reduced motion: plain fade, no transform
         nameEl.animate(
           [{ opacity: 0 }, { opacity: 1 }],
           { duration: 800, easing: 'ease-out', fill: 'forwards' }
         );
       } else {
-        // Full cinematic reveal: rise + scale + fade over 4s
         nameEl.animate(
           [
             { opacity: 0, transform: 'translateY(80px) scale(0.85)' },
@@ -452,7 +530,7 @@ const INITIAL_VISIBLE = 4;
     filterGroup.addEventListener('click', (e) => {
       if (!(e.target instanceof HTMLElement)) return;
       const btn = e.target.closest('.filter-pill');
-      if (!btn) return;
+      if (!(btn instanceof HTMLElement)) return;
 
       const filter = btn.dataset.filter ?? 'All';
 
@@ -490,6 +568,108 @@ const INITIAL_VISIBLE = 4;
         card.dataset.hidden = 'false';
       });
       viewAllBtn.hidden = true;
+    });
+  }
+
+  // ── Video Modal ──────────────────────────────────────────────────────────
+  const modal        = document.getElementById('video-modal');
+  const backdrop     = document.getElementById('modal-backdrop');
+  const modalInner   = document.getElementById('modal-inner');
+  const modalPlayer  = document.getElementById('modal-player');
+  const modalClose   = document.getElementById('modal-close');
+  const modalTitleEl = document.getElementById('modal-title');
+  const modalMetaEl  = document.getElementById('modal-meta');
+  const modalCatEl   = document.getElementById('modal-category');
+
+  if (modal && backdrop && modalInner && modalPlayer && modalClose) {
+    const m  = modal;
+    const bd = backdrop;
+    const mi = modalInner;
+    const mp = modalPlayer as HTMLElement & { pause?: () => void };
+    const mc = modalClose;
+
+    let isOpen = false;
+    let lastFocused: Element | null = null;
+
+    function openModal(detail: { playbackId: string; title: string; meta: string; category: string; rect: DOMRect }) {
+      const { playbackId, title, meta, category, rect } = detail;
+      if (!playbackId || isOpen) return;
+      isOpen = true;
+      lastFocused = document.activeElement;
+
+      if (modalTitleEl) modalTitleEl.textContent = title;
+      if (modalMetaEl)  modalMetaEl.textContent  = meta;
+      if (modalCatEl)   modalCatEl.textContent   = category;
+      mp.setAttribute('playback-id', playbackId);
+
+      m.classList.remove('hidden');
+      mi.style.transition = 'none';
+      mi.style.transform  = 'translate(-50%, -50%)';
+      mi.style.opacity    = '0';
+      bd.style.transition = 'none';
+      bd.style.opacity    = '0';
+      m.style.pointerEvents = 'none';
+
+      void mi.offsetHeight;
+      const mRect = mi.getBoundingClientRect();
+
+      const scaleX = rect.width  / mRect.width;
+      const scaleY = rect.height / mRect.height;
+      const tx     = (rect.left + rect.width  / 2) - (window.innerWidth  / 2);
+      const ty     = (rect.top  + rect.height / 2) - (window.innerHeight / 2);
+
+      mi.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scaleX}, ${scaleY})`;
+      mi.style.opacity   = '1';
+
+      document.body.style.overflow = 'hidden';
+      document.getElementById('page-wrap')?.classList.add('modal-open');
+
+      void mi.offsetHeight;
+
+      requestAnimationFrame(() => {
+        mi.style.transition = 'transform 0.46s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease';
+        mi.style.transform  = 'translate(-50%, -50%)';
+        bd.style.transition = 'opacity 0.35s ease';
+        bd.style.opacity    = '1';
+        m.style.pointerEvents = 'auto';
+      });
+
+      setTimeout(() => mc.focus(), 480);
+    }
+
+    function closeModal() {
+      if (!isOpen) return;
+      isOpen = false;
+      m.style.pointerEvents = 'none';
+
+      try { mp.pause?.(); } catch (_) {}
+
+      mi.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
+      mi.style.transform  = 'translate(-50%, -50%) scale(0.94)';
+      mi.style.opacity    = '0';
+      bd.style.transition = 'opacity 0.28s ease';
+      bd.style.opacity    = '0';
+
+      setTimeout(() => {
+        m.classList.add('hidden');
+        mp.removeAttribute('playback-id');
+        document.body.style.overflow = '';
+        document.getElementById('page-wrap')?.classList.remove('modal-open');
+        if (lastFocused instanceof HTMLElement) lastFocused.focus();
+      }, 320);
+    }
+
+    document.addEventListener('video:open', (e) => {
+      openModal((e as CustomEvent<{ playbackId: string; title: string; meta: string; category: string; rect: DOMRect }>).detail);
+    });
+    mc.addEventListener('click', closeModal);
+
+    m.addEventListener('click', (e) => {
+      if (!mi.contains(e.target as Node | null)) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) closeModal();
     });
   }
 </script>
