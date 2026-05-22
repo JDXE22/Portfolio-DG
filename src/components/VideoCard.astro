@@ -1,0 +1,141 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  category: string;
+  playbackId: string;
+  poster?: string;
+  meta: string;
+  hidden?: boolean;
+}
+
+const { id, title, category, playbackId, poster, meta, hidden = false } = Astro.props;
+
+// Fallback chain: explicit prop → Mux thumbnail → local placeholder
+const resolvedPoster =
+  poster ||
+  (playbackId ? `https://image.mux.com/${playbackId}/thumbnail.jpg` : '') ||
+  '/posters/placeholder.svg';
+---
+
+<article
+  class="video-card relative rounded-lg overflow-hidden ghost-border cursor-pointer group"
+  data-id={id}
+  data-category={category}
+  data-hidden={hidden ? 'true' : 'false'}
+  style="background: var(--color-surface-container-lowest);"
+  aria-label={`${title} — ${category}`}
+  role="button"
+  tabindex="0"
+>
+  <!-- Skeleton placeholder -->
+  <div
+    class="skeleton absolute inset-0 z-10 rounded-lg transition-opacity duration-500"
+    data-skeleton
+    aria-hidden="true"
+  ></div>
+
+  <!-- Video / Poster -->
+  {playbackId ? (
+    <mux-player
+      class="w-full aspect-video block"
+      playback-id={playbackId}
+      poster={resolvedPoster}
+      muted
+      playsinline
+      preload="none"
+      stream-type="on-demand"
+      tabindex="-1"
+      aria-label={title}
+      data-video
+      style="--controls: none; --media-object-fit: cover;"
+    ></mux-player>
+  ) : (
+    <img
+      class="w-full aspect-video object-cover block"
+      src={resolvedPoster}
+      alt={title}
+      loading="lazy"
+      aria-hidden="true"
+    />
+  )}
+
+  <!-- Overlay info -->
+  <div
+    class="absolute bottom-0 left-0 right-0 p-4 z-20"
+    style="background: linear-gradient(to top, color-mix(in srgb, var(--color-surface-container-lowest) 90%, transparent), transparent);"
+  >
+    <p
+      class="text-xs uppercase tracking-widest mb-1"
+      style="color: var(--color-primary); letter-spacing: 0.15em;"
+    >
+      {category}
+    </p>
+    <h3 class="font-display text-sm font-semibold text-on-surface leading-snug">{title}</h3>
+    <p class="text-xs mt-1" style="color: var(--color-on-surface-variant);">{meta}</p>
+  </div>
+</article>
+
+<script lang="ts">
+  import '@mux/mux-player';
+
+  document.querySelectorAll('.video-card').forEach((card) => {
+    if (!(card instanceof HTMLElement)) return;
+
+    const videoEl = card.querySelector<HTMLVideoElement>('[data-video]');
+    const skeleton = card.querySelector<HTMLElement>('[data-skeleton]');
+
+    // Helper: hide skeleton
+    const hideSkeleton = () => {
+      if (skeleton instanceof HTMLElement) skeleton.style.opacity = '0';
+    };
+
+    if (!videoEl) {
+      // No video — hide skeleton immediately
+      hideSkeleton();
+      return;
+    }
+
+    // mux-player proxies play/pause/currentTime/paused/canplay natively —
+    // no cast needed, treat it as the media element directly.
+
+    // Hide skeleton when media is ready
+    videoEl.addEventListener('canplay', hideSkeleton);
+
+    // Hover play / pause (respects prefers-reduced-motion)
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    card.addEventListener('mouseenter', () => {
+      if (!prefersReduced) videoEl.play().catch(() => {});
+    });
+
+    card.addEventListener('mouseleave', () => {
+      videoEl.pause();
+      videoEl.currentTime = 0;
+    });
+
+    // Keyboard: focusin/focusout are now reachable because the
+    // article has tabindex="0" and role="button"
+    card.addEventListener('focusin', () => {
+      if (!prefersReduced) videoEl.play().catch(() => {});
+    });
+
+    card.addEventListener('focusout', () => {
+      videoEl.pause();
+      videoEl.currentTime = 0;
+    });
+
+    // Allow Enter/Space to toggle play like a button
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (videoEl.paused) {
+          videoEl.play().catch(() => {});
+        } else {
+          videoEl.pause();
+          videoEl.currentTime = 0;
+        }
+      }
+    });
+  });
+</script>

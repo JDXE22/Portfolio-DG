@@ -1,11 +1,496 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Button from '../components/Button.astro';
+import TrustedBy from '../components/TrustedBy.astro';
+import VideoCard from '../components/VideoCard.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const isReelReady = false;
+
+const navLinks = [
+  { id: 'hero',           label: 'Home',           href: '#hero' },
+  { id: 'about',          label: 'About',          href: '#about' },
+  { id: 'cinematography', label: 'Cinematography', href: '#cinematography' },
+  { id: 'contact',        label: 'Contact',        href: '#contact' },
+];
+
+const logos = [
+  { name: 'HoneyBaked', src: '/logos/HoneyBaked.svg' },
+  { name: 'Etihad',     src: '/logos/Etihad.svg' },
+  { name: 'Allstate',   src: '/logos/Allstate.svg',  width: 180 },
+  { name: 'Kroger',     src: '/logos/Kroger.svg' },
+  { name: 'Georgia',    src: '/logos/Georgia.svg',   width: 200 },
+  { name: 'OldSpice',   src: '/logos/OldSpice.svg' },
+  { name: 'Swiffer',    src: '/logos/Swiffer.svg' },
+  { name: 'Tide',       src: '/logos/Tide.svg' },
+  { name: 'PndG',       src: '/logos/PndG.svg' },
+];
+
+const categories = ['All', 'Commercial', 'Interview', 'Art', 'Social', 'Narrative'];
+
+const videos = [
+  {
+    id: 'v1',
+    title: 'Urban Pulse',
+    category: 'Commercial',
+    playbackId: '',                         // TODO: Mux playback ID
+    meta: '4K • ANAMORPHIC • 2024',
+  },
+  {
+    id: 'v2',
+    title: 'Quiet Hours',
+    category: 'Interview',
+    playbackId: '',
+    meta: '4K • SPHERICAL • 2024',
+  },
+  {
+    id: 'v3',
+    title: 'Chromatic Drift',
+    category: 'Art',
+    playbackId: '',
+    meta: '6K • ANAMORPHIC • 2023',
+  },
+  {
+    id: 'v4',
+    title: 'Grid & Grain',
+    category: 'Social',
+    playbackId: '',
+    meta: '4K • SPHERICAL • 2024',
+  },
+  {
+    id: 'v5',
+    title: 'The Long Road',
+    category: 'Narrative',
+    playbackId: '',
+    meta: '4K • ANAMORPHIC • 2023',
+  },
+  {
+    id: 'v6',
+    title: 'Signal & Noise',
+    category: 'Commercial',
+    playbackId: '',
+    meta: '4K • SPHERICAL • 2024',
+  },
+];
+
+const INITIAL_VISIBLE = 4;
 ---
 
 <Layout>
-	<Welcome />
+  <!-- ── Preloader ──────────────────────────────── -->
+  <div
+    id="preloader"
+    aria-hidden="true"
+    class="fixed inset-0 z-100 flex items-center justify-center"
+    style="background: var(--color-surface-container-lowest);"
+  >
+    <h1
+      class="font-display font-bold text-on-surface select-none"
+      style="font-size: clamp(3rem, 10vw, 7rem); letter-spacing: -0.04em;"
+    >
+      Daniel Gualdron
+    </h1>
+  </div>
+
+  <!-- ── Navigation ────────────────────────────── -->
+  <Navbar links={navLinks} />
+
+  <div id="page-wrap">
+  <main id="main-content">
+
+    <!-- ── Hero ─────────────────────────────────── -->
+    <section
+      id="hero"
+      aria-label="Hero"
+      class="relative min-h-screen flex flex-col justify-end pb-20 px-6 md:px-12 pt-32"
+      style="background: var(--color-surface);"
+    >
+      <!-- Background portrait -->
+      <img
+        src="https://res.cloudinary.com/dqyaxyvxz/image/upload/f_auto,q_auto,w_1920/v1779308364/20250720-DaniShinobi-9_skz4wd.jpg"
+        alt=""
+        aria-hidden="true"
+        width="1920"
+        height="1080"
+        loading="eager"
+        fetchpriority="high"
+        class="absolute inset-0 w-full h-full object-cover object-center"
+        style="z-index: 0;"
+      />
+      <!-- Dark gradient overlay — keeps text legible -->
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="z-index: 1; background: linear-gradient(to top, var(--color-surface) 20%, color-mix(in srgb, var(--color-surface) 50%, transparent) 55%, color-mix(in srgb, var(--color-surface) 20%, transparent) 100%);"
+        aria-hidden="true"
+      ></div>
+
+      <div class="relative max-w-4xl" style="z-index: 2;">
+        <p
+          class="text-xs uppercase tracking-widest mb-6"
+          style="color: var(--color-primary); letter-spacing: 0.15em;"
+        >
+          Director of Photography
+        </p>
+        <h2
+          class="font-display font-bold text-on-surface mb-8 leading-none"
+          style="font-size: clamp(2.5rem, 7vw, 5.5rem); letter-spacing: -0.04em;"
+        >
+          Framing stories<br />worth watching.
+        </h2>
+        <div class="flex items-center gap-4 flex-wrap">
+          {isReelReady ? (
+            <Button variant="primary" href="#reel" label="Watch the reel">
+              Watch the Reel
+            </Button>
+          ) : (
+            <Button variant="primary" disabled label="Reel coming soon">
+              Reel Coming Soon
+            </Button>
+          )}
+          <Button variant="secondary" href="#cinematography">
+            View Work
+          </Button>
+        </div>
+
+        <!-- Scroll cue -->
+        <div class="flex items-center gap-3 mt-6" aria-hidden="true">
+          <div
+            class="w-8 h-px"
+            style="background: var(--color-primary);"
+          ></div>
+          <span class="text-xs uppercase tracking-widest" style="color: var(--color-outline-variant); letter-spacing: 0.15em;">
+            Scroll to explore
+          </span>
+          <span
+            class="text-on-surface-variant animate-bounce"
+            style="animation-duration: 2s;"
+          >↓</span>
+        </div>
+      </div>
+
+      <!-- Trusted By -->
+      <div class="relative mt-20" style="z-index: 2; border-top: 1px solid color-mix(in srgb, var(--color-outline-variant) 15%, transparent); padding-top: 2rem;">
+        <p
+          class="text-xs uppercase tracking-widest mb-6 px-0"
+          style="color: var(--color-outline-variant); letter-spacing: 0.15em;"
+        >
+          Trusted by
+        </p>
+        <TrustedBy logos={logos} />
+      </div>
+    </section>
+
+    <!-- ── About ─────────────────────────────────── -->
+    <section
+      id="about"
+      aria-label="About"
+      class="px-6 md:px-12 py-24 md:py-32"
+      style="background: var(--color-surface-container-low);"
+    >
+      <div class="max-w-6xl mx-auto grid md:grid-cols-[3fr_2fr] gap-12 md:gap-20 items-center">
+
+        <!-- Bio -->
+        <div>
+          <p
+            class="text-xs uppercase tracking-widest mb-6"
+            style="color: var(--color-primary); letter-spacing: 0.15em;"
+          >
+            About
+          </p>
+          <h2
+            class="font-display font-bold text-on-surface mb-6 leading-tight"
+            style="font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em;"
+          >
+            Every frame is<br />a decision.
+          </h2>
+          <p class="text-base leading-relaxed mb-4" style="color: var(--color-on-surface-variant);">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
+            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+            ullamco laboris nisi ut aliquip ex ea commodo consequat.
+          </p>
+          <p class="text-base leading-relaxed mb-8" style="color: var(--color-on-surface-variant);">
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+            nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+            officia deserunt mollit anim id est laborum.
+          </p>
+        </div>
+
+        <!-- Portrait -->
+        <div class="relative">
+          <div
+            class="relative rounded-lg overflow-hidden"
+            style="background: var(--color-surface-container-high);"
+          >
+            <!-- Inner glow overlay -->
+            <div
+              class="absolute inset-0 z-10 rounded-lg pointer-events-none"
+              style="box-shadow: inset 0 0 40px color-mix(in srgb, var(--color-surface-container-lowest) 30%, transparent);"
+              aria-hidden="true"
+            ></div>
+            <img
+              src="https://res.cloudinary.com/dqyaxyvxz/image/upload/f_auto,q_auto,w_600/v1779308186/ssf_Green_Rose-5_vcyvzk.heic"
+              alt="Daniel Gualdron, Director of Photography"
+              width="600"
+              height="750"
+              loading="lazy"
+              class="portrait-img w-full object-cover block"
+              style="aspect-ratio: 4/5;"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Cinematography ─────────────────────────── -->
+    <section
+      id="cinematography"
+      aria-label="Cinematography work"
+      class="px-6 md:px-12 py-24 md:py-32"
+      style="background: var(--color-surface);"
+    >
+      <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <p
+              class="text-xs uppercase tracking-widest mb-3"
+              style="color: var(--color-primary); letter-spacing: 0.15em;"
+            >
+              Work
+            </p>
+            <h2
+              class="font-display font-bold text-on-surface leading-tight"
+              style="font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.03em;"
+            >
+              Cinematography
+            </h2>
+          </div>
+
+          <!-- Category filters -->
+          <div
+            role="group"
+            aria-label="Filter by category"
+            class="flex flex-wrap gap-2"
+            id="filter-group"
+          >
+            {categories.map((cat, i) => (
+              <button
+                type="button"
+                class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
+                data-filter={cat}
+                aria-pressed={i === 0 ? 'true' : 'false'}
+                style={i !== 0 ? `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);` : ''}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- Video grid -->
+        <div
+          id="video-grid"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6"
+          role="list"
+          aria-label="Video portfolio"
+        >
+          {videos.map((v, i) => (
+            <div role="listitem">
+              <VideoCard
+                id={v.id}
+                title={v.title}
+                category={v.category}
+                playbackId={v.playbackId}
+                meta={v.meta}
+                hidden={i >= INITIAL_VISIBLE}
+              />
+            </div>
+          ))}
+        </div>
+
+        <!-- View All -->
+        {videos.length > INITIAL_VISIBLE && (
+          <div class="mt-10 text-center">
+            <Button
+              variant="secondary"
+              id="view-all-btn"
+              label="Show all cinematography work"
+            >
+              View All Work
+            </Button>
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- ── Contact ────────────────────────────────── -->
+    <section
+      id="contact"
+      aria-label="Contact"
+      class="px-6 md:px-12 py-24 md:py-32"
+      style="background: var(--color-surface-container-lowest);"
+    >
+      <div class="max-w-2xl mx-auto text-center">
+        <p
+          class="text-xs uppercase tracking-widest mb-6"
+          style="color: var(--color-primary); letter-spacing: 0.15em;"
+        >
+          Get in touch
+        </p>
+        <h2
+          class="font-display font-bold text-on-surface mb-6 leading-tight"
+          style="font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -0.04em;"
+        >
+          Let's make<br />something great.
+        </h2>
+        <p class="text-base leading-relaxed mb-10" style="color: var(--color-on-surface-variant);">
+          Available for commercial, narrative, and documentary projects.
+          Reach out to discuss your vision.
+        </p>
+
+        <!-- Email CTA -->
+        <Button
+          variant="primary"
+          href="mailto:gualdrondaniel@gmail.com"
+          label="Email Daniel Gualdron"
+        >
+          Email Me
+        </Button>
+
+        <!-- Social links -->
+        <div class="flex items-center justify-center gap-8 mt-12">
+          <a
+            href="https://instagram.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Daniel Gualdron on Instagram (opens in new tab)"
+            class="text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            Instagram
+          </a>
+          <div class="w-px h-4" style="background: var(--color-outline-variant);" aria-hidden="true"></div>
+          <a
+            href="https://www.linkedin.com/in/daniel-gualdron-858063271"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Daniel Gualdron on LinkedIn (opens in new tab)"
+            class="text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            LinkedIn
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────── -->
+  <footer
+    id="site-footer"
+    role="contentinfo"
+    class="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-4"
+    style="background: var(--color-surface-container-lowest); border-top: 1px solid color-mix(in srgb, var(--color-outline-variant) 10%, transparent);"
+  >
+    <p class="text-xs" style="color: var(--color-outline-variant);">
+      &copy; {new Date().getFullYear()} Daniel Gualdron. All rights reserved.
+    </p>
+    <p class="text-xs" style="color: var(--color-outline-variant);">
+      Director of Photography
+    </p>
+  </footer>
+  </div>{/* #page-wrap */}
 </Layout>
+
+<!-- ── Scripts ───────────────────────────────────── -->
+<script lang="ts">
+  const preloader  = document.getElementById('preloader');
+  const pageWrap   = document.getElementById('page-wrap');
+  const siteHeader = document.querySelector('body > header');
+
+  if (preloader) {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nameEl = preloader.querySelector('h1');
+
+    if (nameEl) {
+      if (prefersReduced) {
+        // Reduced motion: plain fade, no transform
+        nameEl.animate(
+          [{ opacity: 0 }, { opacity: 1 }],
+          { duration: 800, easing: 'ease-out', fill: 'forwards' }
+        );
+      } else {
+        // Full cinematic reveal: rise + scale + fade over 4s
+        nameEl.animate(
+          [
+            { opacity: 0, transform: 'translateY(80px) scale(0.85)' },
+            { opacity: 1, transform: 'translateY(0px)  scale(1)'    },
+          ],
+          { duration: 4000, easing: 'ease-in-out', fill: 'forwards' }
+        );
+      }
+    }
+
+    const holdDelay = prefersReduced ? 1000 : 5500;
+
+    setTimeout(() => {
+      preloader.classList.add('done');
+
+      setTimeout(() => {
+        if (pageWrap)   pageWrap.classList.add('revealed');
+        if (siteHeader) siteHeader.classList.add('revealed');
+      }, prefersReduced ? 0 : 900);
+
+      preloader.addEventListener('animationend', (e) => {
+        if (e.animationName !== 'fadeOut') return;
+        preloader.remove();
+      }, { once: true });
+    }, holdDelay);
+  }
+
+  const filterGroup = document.getElementById('filter-group');
+  const videoGrid = document.getElementById('video-grid');
+
+  if (filterGroup && videoGrid) {
+    filterGroup.addEventListener('click', (e) => {
+      if (!(e.target instanceof HTMLElement)) return;
+      const btn = e.target.closest('.filter-pill');
+      if (!btn) return;
+
+      const filter = btn.dataset.filter ?? 'All';
+
+      filterGroup.querySelectorAll('.filter-pill').forEach((pill) => {
+        const isActive = pill === btn;
+        pill.classList.toggle('active', isActive);
+        pill.setAttribute('aria-pressed', String(isActive));
+        if (pill instanceof HTMLElement) {
+          if (!isActive) {
+            pill.style.cssText = `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);`;
+          } else {
+            pill.style.cssText = '';
+          }
+        }
+      });
+
+      videoGrid.querySelectorAll('.video-card').forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        const match = filter === 'All' || card.dataset.category === filter;
+        card.dataset.hidden = match ? 'false' : 'true';
+      });
+
+      const viewAllBtn = document.getElementById('view-all-btn');
+      if (viewAllBtn) viewAllBtn.hidden = false;
+    });
+  }
+
+  // View All toggle
+  const viewAllBtn = document.getElementById('view-all-btn');
+
+  if (viewAllBtn && videoGrid) {
+    viewAllBtn.addEventListener('click', () => {
+      videoGrid.querySelectorAll('.video-card').forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        card.dataset.hidden = 'false';
+      });
+      viewAllBtn.hidden = true;
+    });
+  }
+</script>
+
