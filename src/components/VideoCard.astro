@@ -11,7 +11,11 @@ interface Props {
 
 const { id, title, category, playbackId, poster, meta, hidden = false } = Astro.props;
 
-const resolvedPoster = poster || (playbackId ? `https://image.mux.com/${playbackId}/thumbnail.jpg` : '');
+// Fallback chain: explicit prop → Mux thumbnail → local placeholder
+const resolvedPoster =
+  poster ||
+  (playbackId ? `https://image.mux.com/${playbackId}/thumbnail.jpg` : '') ||
+  '/posters/placeholder.svg';
 ---
 
 <article
@@ -21,6 +25,8 @@ const resolvedPoster = poster || (playbackId ? `https://image.mux.com/${playback
   data-hidden={hidden ? 'true' : 'false'}
   style="background: var(--color-surface-container-lowest);"
   aria-label={`${title} — ${category}`}
+  role="button"
+  tabindex="0"
 >
   <!-- Skeleton placeholder -->
   <div
@@ -70,43 +76,66 @@ const resolvedPoster = poster || (playbackId ? `https://image.mux.com/${playback
   </div>
 </article>
 
-<script>
+<script lang="ts">
   import '@mux/mux-player';
 
-  document.querySelectorAll<HTMLElement>('.video-card').forEach((card) => {
-    const video = card.querySelector<HTMLVideoElement>('[data-video]');
+  document.querySelectorAll('.video-card').forEach((card) => {
+    if (!(card instanceof HTMLElement)) return;
+
+    const videoEl = card.querySelector<HTMLVideoElement>('[data-video]');
     const skeleton = card.querySelector<HTMLElement>('[data-skeleton]');
 
-    if (!video) {
+    // Helper: hide skeleton
+    const hideSkeleton = () => {
+      if (skeleton instanceof HTMLElement) skeleton.style.opacity = '0';
+    };
+
+    if (!videoEl) {
       // No video — hide skeleton immediately
-      if (skeleton) skeleton.style.opacity = '0';
+      hideSkeleton();
       return;
     }
 
+    // mux-player proxies play/pause/currentTime/paused/canplay natively —
+    // no cast needed, treat it as the media element directly.
+
     // Hide skeleton when media is ready
-    video.addEventListener('canplay', () => {
-      if (skeleton) skeleton.style.opacity = '0';
-    });
+    videoEl.addEventListener('canplay', hideSkeleton);
 
     // Hover play / pause (respects prefers-reduced-motion)
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     card.addEventListener('mouseenter', () => {
-      if (!prefersReduced) video.play().catch(() => {});
+      if (!prefersReduced) videoEl.play().catch(() => {});
     });
 
     card.addEventListener('mouseleave', () => {
-      video.pause();
-      video.currentTime = 0;
+      videoEl.pause();
+      videoEl.currentTime = 0;
     });
 
+    // Keyboard: focusin/focusout are now reachable because the
+    // article has tabindex="0" and role="button"
     card.addEventListener('focusin', () => {
-      if (!prefersReduced) video.play().catch(() => {});
+      if (!prefersReduced) videoEl.play().catch(() => {});
     });
 
     card.addEventListener('focusout', () => {
-      video.pause();
-      video.currentTime = 0;
+      videoEl.pause();
+      videoEl.currentTime = 0;
+    });
+
+    // Allow Enter/Space to toggle play like a button
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (videoEl.paused) {
+          videoEl.play().catch(() => {});
+        } else {
+          videoEl.pause();
+          videoEl.currentTime = 0;
+        }
+      }
     });
   });
 </script>

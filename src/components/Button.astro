@@ -1,11 +1,15 @@
 ---
-interface Props {
+import type { HTMLAttributes } from 'astro/types';
+
+type AnchorAttrs = HTMLAttributes<'a'>;
+type ButtonAttrs = HTMLAttributes<'button'>;
+
+interface Props extends AnchorAttrs, ButtonAttrs {
   variant?: 'primary' | 'secondary' | 'tertiary';
   href?: string;
   disabled?: boolean;
-  class?: string;
-  type?: 'button' | 'submit';
   label?: string;
+  type?: 'button' | 'submit';
 }
 
 const {
@@ -15,6 +19,9 @@ const {
   class: extraClass = '',
   type = 'button',
   label,
+  // Collect every other attribute (id, data-*, aria-*, name, …)
+  // so they can be spread onto the underlying element.
+  ...rest
 } = Astro.props;
 
 const base =
@@ -44,11 +51,11 @@ const variants = {
 };
 
 const cls = `${base} ${variants[variant]} ${extraClass}`;
-const Tag = href ? 'a' : 'button';
 ---
 
 {href ? (
   <a
+    {...rest}
     href={disabled ? undefined : href}
     class={cls}
     aria-disabled={disabled ? 'true' : undefined}
@@ -62,6 +69,7 @@ const Tag = href ? 'a' : 'button';
   </a>
 ) : (
   <button
+    {...rest}
     type={type}
     class={cls}
     disabled={disabled}
@@ -74,3 +82,4 @@ const Tag = href ? 'a' : 'button';
     )}
   </button>
 )}
+

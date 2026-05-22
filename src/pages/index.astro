@@ -312,7 +312,7 @@ const INITIAL_VISIBLE = 4;
           <div class="mt-10 text-center">
             <Button
               variant="secondary"
-              aria-label="view-all-btn"
+              id="view-all-btn"
               label="Show all cinematography work"
             >
               View All Work
@@ -400,14 +400,14 @@ const INITIAL_VISIBLE = 4;
 </Layout>
 
 <!-- ── Scripts ───────────────────────────────────── -->
-<script>
+<script lang="ts">
   const preloader  = document.getElementById('preloader');
   const pageWrap   = document.getElementById('page-wrap');
-  const siteHeader = document.querySelector<HTMLElement>('body > header');
+  const siteHeader = document.querySelector('body > header');
 
   if (preloader) {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const nameEl = preloader.querySelector<HTMLElement>('h1');
+    const nameEl = preloader.querySelector('h1');
 
     if (nameEl) {
       if (prefersReduced) {
@@ -439,7 +439,7 @@ const INITIAL_VISIBLE = 4;
       }, prefersReduced ? 0 : 900);
 
       preloader.addEventListener('animationend', (e) => {
-        if ((e as AnimationEvent).animationName !== 'fadeOut') return;
+        if (e.animationName !== 'fadeOut') return;
         preloader.remove();
       }, { once: true });
     }, holdDelay);
@@ -450,23 +450,27 @@ const INITIAL_VISIBLE = 4;
 
   if (filterGroup && videoGrid) {
     filterGroup.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.filter-pill');
+      if (!(e.target instanceof HTMLElement)) return;
+      const btn = e.target.closest('.filter-pill');
       if (!btn) return;
 
       const filter = btn.dataset.filter ?? 'All';
 
-      filterGroup.querySelectorAll<HTMLButtonElement>('.filter-pill').forEach((pill) => {
+      filterGroup.querySelectorAll('.filter-pill').forEach((pill) => {
         const isActive = pill === btn;
         pill.classList.toggle('active', isActive);
         pill.setAttribute('aria-pressed', String(isActive));
-        if (!isActive) {
-          pill.style.cssText = `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);`;
-        } else {
-          pill.style.cssText = '';
+        if (pill instanceof HTMLElement) {
+          if (!isActive) {
+            pill.style.cssText = `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);`;
+          } else {
+            pill.style.cssText = '';
+          }
         }
       });
 
-      videoGrid.querySelectorAll<HTMLElement>('.video-card').forEach((card) => {
+      videoGrid.querySelectorAll('.video-card').forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
         const match = filter === 'All' || card.dataset.category === filter;
         card.dataset.hidden = match ? 'false' : 'true';
       });
@@ -481,10 +485,12 @@ const INITIAL_VISIBLE = 4;
 
   if (viewAllBtn && videoGrid) {
     viewAllBtn.addEventListener('click', () => {
-      videoGrid.querySelectorAll<HTMLElement>('.video-card').forEach((card) => {
+      videoGrid.querySelectorAll('.video-card').forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
         card.dataset.hidden = 'false';
       });
       viewAllBtn.hidden = true;
     });
   }
 </script>
+
