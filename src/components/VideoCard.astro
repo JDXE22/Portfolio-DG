@@ -94,12 +94,10 @@ const resolvedPoster =
     };
 
     if (!videoEl) {
-      // No video — hide skeleton immediately
       hideSkeleton();
       return;
     }
 
-    // preload="none" means canplay never fires until hover — preload poster via Image instead
     const playbackId = videoEl.getAttribute('playback-id');
     if (playbackId) {
       const thumb = new Image();
