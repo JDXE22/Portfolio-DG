@@ -12,7 +12,7 @@
 - [x] Create `TrustedBy.astro` with a looping CSS marquee of logos.
   - CSS-only using duplicated logo set + `animate-marquee` keyframe.
 - [x] Create `VideoCard.astro` with skeleton overlay, video markup, and data attributes.
-  - Skeleton hides on `loadeddata`; hover play respects `prefers-reduced-motion`.
+  - Skeleton hides on `canplay` (fires when the browser has buffered enough to begin playback — preferred over `loadeddata` which only guarantees the first frame is decoded); hover play respects `prefers-reduced-motion`.
 - [x] Replace `src/pages/index.astro` content with the new single-page structure and sections.
 - [x] Implement the preloader overlay and transition logic in `index.astro`.
   - Respects `prefers-reduced-motion` (instant dismiss when reduced motion preferred).
