@@ -553,24 +553,29 @@ From concept development to the final edit, I immerse myself in every step of th
   const filterGroup   = document.getElementById('filter-group');
   const videoGrid     = document.getElementById('video-grid');
   const viewAllBtn    = document.getElementById('view-all-btn');
-  const INITIAL_LIMIT = 4;
+  const INITIAL_VISIBLE_COUNT = 4;
+  const INACTIVE_PILL_STYLE   = 'border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);';
+  const FOCUSABLE_SELECTOR    = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
   let expanded = false;
 
+  function cardMatchesFilter(card: HTMLElement, filter: string): boolean {
+    return filter === 'All' || card.dataset.category === filter;
+  }
+
   function getActiveFilter(): string {
-    const active = filterGroup?.querySelector('.filter-pill.active');
-    return (active instanceof HTMLElement ? active.dataset.filter : null) ?? 'All';
+    const activepill = filterGroup?.querySelector('.filter-pill.active');
+    return (activepill instanceof HTMLElement ? activepill.dataset.filter : null) ?? 'All';
   }
 
   function collapseGrid(filter: string) {
     if (!videoGrid) return;
-    let shown = 0;
+    let visibleCount = 0;
     videoGrid.querySelectorAll('.video-card').forEach((card) => {
       if (!(card instanceof HTMLElement)) return;
-      const matches = filter === 'All' || card.dataset.category === filter;
-      if (matches) {
-        shown++;
-        card.dataset.hidden = shown > INITIAL_LIMIT ? 'true' : 'false';
+      if (cardMatchesFilter(card, filter)) {
+        visibleCount++;
+        card.dataset.hidden = visibleCount > INITIAL_VISIBLE_COUNT ? 'true' : 'false';
       }
     });
   }
@@ -579,10 +584,9 @@ From concept development to the final edit, I immerse myself in every step of th
     if (!viewAllBtn || !videoGrid) return;
     let matchCount = 0;
     videoGrid.querySelectorAll('.video-card').forEach((card) => {
-      if (!(card instanceof HTMLElement)) return;
-      if (filter === 'All' || card.dataset.category === filter) matchCount++;
+      if (card instanceof HTMLElement && cardMatchesFilter(card, filter)) matchCount++;
     });
-    viewAllBtn.hidden = matchCount <= INITIAL_LIMIT;
+    viewAllBtn.hidden = matchCount <= INITIAL_VISIBLE_COUNT;
     viewAllBtn.textContent = 'View All Work';
     viewAllBtn.setAttribute('aria-label', 'Show all cinematography work');
   }
@@ -590,29 +594,23 @@ From concept development to the final edit, I immerse myself in every step of th
   if (filterGroup && videoGrid) {
     filterGroup.addEventListener('click', (e) => {
       if (!(e.target instanceof HTMLElement)) return;
-      const btn = e.target.closest('.filter-pill');
-      if (!(btn instanceof HTMLElement)) return;
+      const clickedPill = e.target.closest('.filter-pill');
+      if (!(clickedPill instanceof HTMLElement)) return;
 
-      const filter = btn.dataset.filter ?? 'All';
+      const filter = clickedPill.dataset.filter ?? 'All';
 
       filterGroup.querySelectorAll('.filter-pill').forEach((pill) => {
-        const isActive = pill === btn;
+        const isActive = pill === clickedPill;
         pill.classList.toggle('active', isActive);
         pill.setAttribute('aria-pressed', String(isActive));
         if (pill instanceof HTMLElement) {
-          if (!isActive) {
-            pill.style.cssText = `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);`;
-          } else {
-            pill.style.cssText = '';
-          }
+          pill.style.cssText = isActive ? '' : INACTIVE_PILL_STYLE;
         }
       });
 
-      // Show all matching, then collapse to initial limit
       videoGrid.querySelectorAll('.video-card').forEach((card) => {
         if (!(card instanceof HTMLElement)) return;
-        const match = filter === 'All' || card.dataset.category === filter;
-        card.dataset.hidden = match ? 'false' : 'true';
+        card.dataset.hidden = cardMatchesFilter(card, filter) ? 'false' : 'true';
       });
 
       expanded = false;
@@ -624,18 +622,17 @@ From concept development to the final edit, I immerse myself in every step of th
   // View All / Show Less toggle
   if (viewAllBtn && videoGrid) {
     viewAllBtn.addEventListener('click', () => {
+      const filter = getActiveFilter();
       if (!expanded) {
-        const filter = getActiveFilter();
         videoGrid.querySelectorAll('.video-card').forEach((card) => {
-          if (!(card instanceof HTMLElement)) return;
-          const matches = filter === 'All' || card.dataset.category === filter;
-          if (matches) card.dataset.hidden = 'false';
+          if (card instanceof HTMLElement && cardMatchesFilter(card, filter)) {
+            card.dataset.hidden = 'false';
+          }
         });
         viewAllBtn.textContent = 'Show Less';
         viewAllBtn.setAttribute('aria-label', 'Show fewer videos');
         expanded = true;
       } else {
-        const filter = getActiveFilter();
         collapseGrid(filter);
         viewAllBtn.textContent = 'View All Work';
         viewAllBtn.setAttribute('aria-label', 'Show all cinematography work');
@@ -655,11 +652,7 @@ From concept development to the final edit, I immerse myself in every step of th
   const modalCatEl   = document.getElementById('modal-category');
 
   if (modal && backdrop && modalInner && modalPlayer && modalClose) {
-    const m  = modal;
-    const bd = backdrop;
-    const mi = modalInner;
-    const mp = modalPlayer as HTMLElement & { pause?: () => void };
-    const mc = modalClose;
+    const player = modalPlayer as HTMLElement & { pause?: () => void };
 
     let isOpen = false;
     let lastFocused: Element | null = null;
@@ -673,95 +666,98 @@ From concept development to the final edit, I immerse myself in every step of th
       if (modalTitleEl) modalTitleEl.textContent = title;
       if (modalMetaEl)  modalMetaEl.textContent  = meta;
       if (modalCatEl)   modalCatEl.textContent   = category;
-      mp.setAttribute('playback-id', playbackId);
+      player.setAttribute('playback-id', playbackId);
 
-      m.classList.remove('hidden');
-      mi.style.transition = 'none';
-      mi.style.transform  = 'translate(-50%, -50%)';
-      mi.style.opacity    = '0';
-      bd.style.transition = 'none';
-      bd.style.opacity    = '0';
-      m.style.pointerEvents = 'none';
+      modal.classList.remove('hidden');
+      modalInner.style.transition = 'none';
+      modalInner.style.transform  = 'translate(-50%, -50%)';
+      modalInner.style.opacity    = '0';
+      backdrop.style.transition   = 'none';
+      backdrop.style.opacity      = '0';
+      modal.style.pointerEvents   = 'none';
 
-      void mi.offsetHeight;
-      const mRect = mi.getBoundingClientRect();
+      void modalInner.offsetHeight;
+      const innerRect = modalInner.getBoundingClientRect();
 
-      const scaleX = rect.width  / mRect.width;
-      const scaleY = rect.height / mRect.height;
+      const scaleX = rect.width  / innerRect.width;
+      const scaleY = rect.height / innerRect.height;
       const tx     = (rect.left + rect.width  / 2) - (window.innerWidth  / 2);
       const ty     = (rect.top  + rect.height / 2) - (window.innerHeight / 2);
 
-      mi.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scaleX}, ${scaleY})`;
-      mi.style.opacity   = '1';
+      modalInner.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scaleX}, ${scaleY})`;
+      modalInner.style.opacity   = '1';
 
       document.body.style.overflow = 'hidden';
-      const pw = document.getElementById('page-wrap');
-      pw?.classList.add('modal-open');
-      pw?.setAttribute('inert', '');
+      pageWrap?.classList.add('modal-open');
+      pageWrap?.setAttribute('inert', '');
 
-      void mi.offsetHeight;
+      void modalInner.offsetHeight;
 
       requestAnimationFrame(() => {
-        mi.style.transition = 'transform 0.46s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease';
-        mi.style.transform  = 'translate(-50%, -50%)';
-        bd.style.transition = 'opacity 0.35s ease';
-        bd.style.opacity    = '1';
-        m.style.pointerEvents = 'auto';
+        modalInner.style.transition = 'transform 0.46s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease';
+        modalInner.style.transform  = 'translate(-50%, -50%)';
+        backdrop.style.transition   = 'opacity 0.35s ease';
+        backdrop.style.opacity      = '1';
+        modal.style.pointerEvents   = 'auto';
       });
 
-      setTimeout(() => mc.focus(), 480);
+      setTimeout(() => modalClose.focus(), 480);
     }
 
     function closeModal() {
       if (!isOpen) return;
       isOpen = false;
-      m.style.pointerEvents = 'none';
+      modal.style.pointerEvents = 'none';
 
-      try { mp.pause?.(); } catch (_) {}
+      try { player.pause?.(); } catch (_) {}
 
-      mi.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
-      mi.style.transform  = 'translate(-50%, -50%) scale(0.94)';
-      mi.style.opacity    = '0';
-      bd.style.transition = 'opacity 0.28s ease';
-      bd.style.opacity    = '0';
+      modalInner.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
+      modalInner.style.transform  = 'translate(-50%, -50%) scale(0.94)';
+      modalInner.style.opacity    = '0';
+      backdrop.style.transition   = 'opacity 0.28s ease';
+      backdrop.style.opacity      = '0';
 
       setTimeout(() => {
-        m.classList.add('hidden');
-        mp.removeAttribute('playback-id');
+        modal.classList.add('hidden');
+        player.removeAttribute('playback-id');
         document.body.style.overflow = '';
-        const pw2 = document.getElementById('page-wrap');
-        pw2?.classList.remove('modal-open');
-        pw2?.removeAttribute('inert');
+        pageWrap?.classList.remove('modal-open');
+        pageWrap?.removeAttribute('inert');
         if (lastFocused instanceof HTMLElement) lastFocused.focus();
       }, 320);
+    }
+
+    function trapFocus(e: KeyboardEvent) {
+      const focusableElements = Array.from(
+        modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      ).filter((el) => !el.closest('[hidden]') && el.offsetParent !== null);
+
+      if (focusableElements.length === 0) { e.preventDefault(); return; }
+
+      const firstFocusable = focusableElements[0];
+      const lastFocusable  = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) { e.preventDefault(); lastFocusable.focus(); }
+      } else {
+        if (document.activeElement === lastFocusable)  { e.preventDefault(); firstFocusable.focus(); }
+      }
     }
 
     document.addEventListener('video:open', (e) => {
       openModal((e as CustomEvent<{ playbackId: string; title: string; meta: string; category: string; rect: DOMRect }>).detail);
     });
-    mc.addEventListener('click', closeModal);
 
-    m.addEventListener('click', (e) => {
-      if (!mi.contains(e.target as Node | null)) closeModal();
+    modalClose.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+      if (!modalInner.contains(e.target as Node | null)) closeModal();
     });
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isOpen) { closeModal(); return; }
-      if (e.key === 'Tab' && isOpen) {
-        const focusable = Array.from(
-          m.querySelectorAll<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-          )
-        ).filter((el) => !el.closest('[hidden]') && el.offsetParent !== null);
-        if (focusable.length === 0) { e.preventDefault(); return; }
-        const first = focusable[0];
-        const last  = focusable[focusable.length - 1];
-        if (e.shiftKey) {
-          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-        } else {
-          if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
-        }
-      }
+      if (!isOpen) return;
+      if (e.key === 'Escape') { closeModal(); return; }
+      if (e.key === 'Tab') trapFocus(e);
     });
   }
 </script>
