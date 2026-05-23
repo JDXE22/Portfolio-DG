@@ -23,6 +23,9 @@ const resolvedPoster =
   data-id={id}
   data-category={category}
   data-hidden={hidden ? 'true' : 'false'}
+  data-playback-id={playbackId}
+  data-title={title}
+  data-meta={meta}
   style="background: var(--color-surface-container-lowest);"
   aria-label={`${title} — ${category}`}
   role="button"
@@ -76,7 +79,7 @@ const resolvedPoster =
   </div>
 </article>
 
-<script lang="ts">
+<script>
   import '@mux/mux-player';
 
   document.querySelectorAll('.video-card').forEach((card) => {
@@ -91,22 +94,21 @@ const resolvedPoster =
     };
 
     if (!videoEl) {
-      // No video — hide skeleton immediately
       hideSkeleton();
       return;
     }
 
-    // mux-player proxies play/pause/currentTime/paused/canplay natively —
-    // no cast needed, treat it as the media element directly.
-
-    // Hide skeleton when media is ready
+    const playbackId = videoEl.getAttribute('playback-id');
+    if (playbackId) {
+      const thumb = new Image();
+      thumb.onload = hideSkeleton;
+      thumb.onerror = hideSkeleton;
+      thumb.src = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+    }
     videoEl.addEventListener('canplay', hideSkeleton);
 
-    // Hover play / pause (respects prefers-reduced-motion)
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     card.addEventListener('mouseenter', () => {
-      if (!prefersReduced) videoEl.play().catch(() => {});
+      videoEl.play().catch(() => {});
     });
 
     card.addEventListener('mouseleave', () => {
@@ -116,25 +118,29 @@ const resolvedPoster =
 
     // Keyboard: focusin/focusout are now reachable because the
     // article has tabindex="0" and role="button"
-    card.addEventListener('focusin', () => {
-      if (!prefersReduced) videoEl.play().catch(() => {});
-    });
+    // Click or keyboard → open modal
+    const openModal = () => {
+      const playbackId = card.dataset.playbackId;
+      if (!playbackId) return;
+      document.dispatchEvent(
+        new CustomEvent('video:open', {
+          detail: {
+            playbackId,
+            title: card.dataset.title ?? '',
+            meta: card.dataset.meta ?? '',
+            category: card.dataset.category ?? '',
+            rect: card.getBoundingClientRect(),
+          },
+        }),
+      );
+    };
 
-    card.addEventListener('focusout', () => {
-      videoEl.pause();
-      videoEl.currentTime = 0;
-    });
+    card.addEventListener('click', openModal);
 
-    // Allow Enter/Space to toggle play like a button
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        if (videoEl.paused) {
-          videoEl.play().catch(() => {});
-        } else {
-          videoEl.pause();
-          videoEl.currentTime = 0;
-        }
+        openModal();
       }
     });
   });
