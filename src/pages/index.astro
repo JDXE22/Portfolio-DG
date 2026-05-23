@@ -625,9 +625,11 @@ From concept development to the final edit, I immerse myself in every step of th
   if (viewAllBtn && videoGrid) {
     viewAllBtn.addEventListener('click', () => {
       if (!expanded) {
+        const filter = getActiveFilter();
         videoGrid.querySelectorAll('.video-card').forEach((card) => {
           if (!(card instanceof HTMLElement)) return;
-          card.dataset.hidden = 'false';
+          const matches = filter === 'All' || card.dataset.category === filter;
+          if (matches) card.dataset.hidden = 'false';
         });
         viewAllBtn.textContent = 'Show Less';
         viewAllBtn.setAttribute('aria-label', 'Show fewer videos');
