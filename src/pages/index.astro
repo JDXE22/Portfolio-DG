@@ -695,7 +695,9 @@ From concept development to the final edit, I immerse myself in every step of th
       mi.style.opacity   = '1';
 
       document.body.style.overflow = 'hidden';
-      document.getElementById('page-wrap')?.classList.add('modal-open');
+      const pw = document.getElementById('page-wrap');
+      pw?.classList.add('modal-open');
+      pw?.setAttribute('inert', '');
 
       void mi.offsetHeight;
 
@@ -727,7 +729,9 @@ From concept development to the final edit, I immerse myself in every step of th
         m.classList.add('hidden');
         mp.removeAttribute('playback-id');
         document.body.style.overflow = '';
-        document.getElementById('page-wrap')?.classList.remove('modal-open');
+        const pw2 = document.getElementById('page-wrap');
+        pw2?.classList.remove('modal-open');
+        pw2?.removeAttribute('inert');
         if (lastFocused instanceof HTMLElement) lastFocused.focus();
       }, 320);
     }
@@ -742,7 +746,22 @@ From concept development to the final edit, I immerse myself in every step of th
     });
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && isOpen) closeModal();
+      if (e.key === 'Escape' && isOpen) { closeModal(); return; }
+      if (e.key === 'Tab' && isOpen) {
+        const focusable = Array.from(
+          m.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => !el.closest('[hidden]') && el.offsetParent !== null);
+        if (focusable.length === 0) { e.preventDefault(); return; }
+        const first = focusable[0];
+        const last  = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+          if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+        }
+      }
     });
   }
 </script>
