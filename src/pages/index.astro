@@ -210,7 +210,7 @@ const INITIAL_VISIBLE = 4;
       class="px-6 md:px-12 py-24 md:py-32"
       style="background: var(--color-surface-container-low);"
     >
-      <div class="max-w-6xl mx-auto grid md:grid-cols-[3fr_2fr] gap-12 md:gap-20 items-center">
+      <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
 
         <!-- Bio -->
         <div>
@@ -546,8 +546,42 @@ const INITIAL_VISIBLE = 4;
     }, holdDelay);
   }
 
-  const filterGroup = document.getElementById('filter-group');
-  const videoGrid = document.getElementById('video-grid');
+  const filterGroup   = document.getElementById('filter-group');
+  const videoGrid     = document.getElementById('video-grid');
+  const viewAllBtn    = document.getElementById('view-all-btn');
+  const INITIAL_LIMIT = 4;
+
+  let expanded = false;
+
+  function getActiveFilter(): string {
+    const active = filterGroup?.querySelector('.filter-pill.active');
+    return (active instanceof HTMLElement ? active.dataset.filter : null) ?? 'All';
+  }
+
+  function collapseGrid(filter: string) {
+    if (!videoGrid) return;
+    let shown = 0;
+    videoGrid.querySelectorAll('.video-card').forEach((card) => {
+      if (!(card instanceof HTMLElement)) return;
+      const matches = filter === 'All' || card.dataset.category === filter;
+      if (matches) {
+        shown++;
+        card.dataset.hidden = shown > INITIAL_LIMIT ? 'true' : 'false';
+      }
+    });
+  }
+
+  function syncViewAllBtn(filter: string) {
+    if (!viewAllBtn || !videoGrid) return;
+    let matchCount = 0;
+    videoGrid.querySelectorAll('.video-card').forEach((card) => {
+      if (!(card instanceof HTMLElement)) return;
+      if (filter === 'All' || card.dataset.category === filter) matchCount++;
+    });
+    viewAllBtn.hidden = matchCount <= INITIAL_LIMIT;
+    viewAllBtn.textContent = 'View All Work';
+    viewAllBtn.setAttribute('aria-label', 'Show all cinematography work');
+  }
 
   if (filterGroup && videoGrid) {
     filterGroup.addEventListener('click', (e) => {
@@ -570,27 +604,37 @@ const INITIAL_VISIBLE = 4;
         }
       });
 
+      // Show all matching, then collapse to initial limit
       videoGrid.querySelectorAll('.video-card').forEach((card) => {
         if (!(card instanceof HTMLElement)) return;
         const match = filter === 'All' || card.dataset.category === filter;
         card.dataset.hidden = match ? 'false' : 'true';
       });
 
-      const viewAllBtn = document.getElementById('view-all-btn');
-      if (viewAllBtn) viewAllBtn.hidden = false;
+      expanded = false;
+      collapseGrid(filter);
+      syncViewAllBtn(filter);
     });
   }
 
-  // View All toggle
-  const viewAllBtn = document.getElementById('view-all-btn');
-
+  // View All / Show Less toggle
   if (viewAllBtn && videoGrid) {
     viewAllBtn.addEventListener('click', () => {
-      videoGrid.querySelectorAll('.video-card').forEach((card) => {
-        if (!(card instanceof HTMLElement)) return;
-        card.dataset.hidden = 'false';
-      });
-      viewAllBtn.hidden = true;
+      if (!expanded) {
+        videoGrid.querySelectorAll('.video-card').forEach((card) => {
+          if (!(card instanceof HTMLElement)) return;
+          card.dataset.hidden = 'false';
+        });
+        viewAllBtn.textContent = 'Show Less';
+        viewAllBtn.setAttribute('aria-label', 'Show fewer videos');
+        expanded = true;
+      } else {
+        const filter = getActiveFilter();
+        collapseGrid(filter);
+        viewAllBtn.textContent = 'View All Work';
+        viewAllBtn.setAttribute('aria-label', 'Show all cinematography work');
+        expanded = false;
+      }
     });
   }
 
