@@ -98,12 +98,12 @@ const resolvedPoster =
       return;
     }
 
-    const playbackId = videoEl.getAttribute('playback-id');
-    if (playbackId) {
+    const thumbnailPlaybackId = videoEl.getAttribute('playback-id');
+    if (thumbnailPlaybackId) {
       const thumb = new Image();
       thumb.onload = hideSkeleton;
       thumb.onerror = hideSkeleton;
-      thumb.src = `https://image.mux.com/${playbackId}/thumbnail.jpg`;
+      thumb.src = `https://image.mux.com/${thumbnailPlaybackId}/thumbnail.jpg`;
     }
     videoEl.addEventListener('canplay', hideSkeleton);
 
