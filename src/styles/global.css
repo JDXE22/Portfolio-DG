@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* ── Surfaces ──────────────────────────────── */
@@ -46,15 +46,24 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   color: var(--color-on-surface);
 }
 
 /* ── Marquee animation ──────────────────────────── */
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {
@@ -69,8 +78,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Preloader ──────────────────────────────────── */
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to   { opacity: 0; pointer-events: none; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 #preloader {
@@ -91,8 +105,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Page reveal (center → up + down) ──────────── */
 @keyframes revealVertical {
-  from { clip-path: inset(50% 0 50% 0); }
-  to   { clip-path: inset(0% 0 0% 0); }
+  from {
+    clip-path: inset(50% 0 50% 0);
+  }
+  to {
+    clip-path: inset(0% 0 0% 0);
+  }
 }
 
 #page-wrap {
@@ -104,29 +122,44 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Navbar hidden until reveal */
-body > header {
-  opacity: 0;
-}
-
-body > header.revealed {
-  transition: opacity 0.8s ease 0.3s;
+body > header nav.scrolled {
+  background: color-mix(
+    in srgb,
+    var(--color-surface-variant) 85%,
+    transparent
+  ) !important;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-outline-variant) 18%, transparent);
+  transition:
+    background 0.3s ease,
+    border-bottom 0.3s ease;
   opacity: 1;
 }
 
 /* ── Navbar scrolled state ──────────────────────── */
 body > header nav.scrolled {
-  background: color-mix(in srgb, var(--color-surface-variant) 85%, transparent) !important;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 18%, transparent);
-  transition: background 0.3s ease, border-bottom 0.3s ease;
+  background: color-mix(
+    in srgb,
+    var(--color-surface-variant) 85%,
+    transparent
+  ) !important;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-outline-variant) 18%, transparent);
+}
+
+body > header nav {
+  transition:
+    background 0.3s ease,
+    border-bottom 0.3s ease;
 }
 
 /* ── Navbar active link dot ─────────────────────── */
-nav a[data-active="true"] {
+nav a[data-active='true'] {
   color: var(--color-on-surface);
   position: relative;
 }
 
-nav a[data-active="true"]::after {
+nav a[data-active='true']::after {
   content: '';
   position: absolute;
   bottom: -6px;
@@ -139,16 +172,50 @@ nav a[data-active="true"]::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #preloader.done { opacity: 0; pointer-events: none; }
-  #page-wrap      { clip-path: none; }
-  body > header   { opacity: 1; }
-  .animate-marquee { animation-duration: 60s; }
+  #preloader.done {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #page-wrap {
+    clip-path: none;
+  }
+  body > header {
+    opacity: 1;
+  }
+  .animate-marquee {
+    animation-duration: 60s;
+  }
 }
 
+.video-card:hover {
+  transform: translateY(-4px) scale(1.012);
+  box-shadow:
+    0 20px 48px
+      color-mix(in srgb, var(--color-surface-container-lowest) 80%, transparent),
+    0 4px 16px color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+/* ── Video card play icon overlay ──────────────── */
+.video-card__play-icon {
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.video-card:hover .video-card__play-icon {
+  opacity: 1;
+  transform: scale(1);
+}
 /* ── Skeleton shimmer ───────────────────────────── */
 @keyframes shimmer {
-  from { background-position: -400px 0; }
-  to   { background-position: 400px 0; }
+  from {
+    background-position: -400px 0;
+  }
+  to {
+    background-position: 400px 0;
+  }
 }
 
 .skeleton {
@@ -165,7 +232,8 @@ nav a[data-active="true"]::after {
 /* ── Ghost border (hover) ───────────────────────── */
 /* Raised from 15% → 25% so the outline is actually perceptible */
 .ghost-border:hover {
-  outline: 1px solid color-mix(in srgb, var(--color-outline-variant) 25%, transparent);
+  outline: 1px solid
+    color-mix(in srgb, var(--color-outline-variant) 25%, transparent);
 }
 
 /* ── Portrait hover ─────────────────────────────── */
@@ -178,28 +246,34 @@ nav a[data-active="true"]::after {
 }
 
 /* ── Video card ─────────────────────────────────── */
-.video-card[data-hidden="true"] {
+.video-card[data-hidden='true'] {
   display: none;
 }
 
-/* Lift on hover — transform GPU-composited for smoothness */
+/* Lift on hover — will-change scoped to interaction to avoid permanent GPU layer promotion */
 .video-card {
-  will-change: transform;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.video-card:hover {
+.video-card:hover,
+.video-card:focus-visible {
+  will-change: transform;
   transform: translateY(-4px) scale(1.012);
-  box-shadow: 0 20px 48px color-mix(in srgb, var(--color-surface-container-lowest) 80%, transparent),
-              0 4px 16px color-mix(in srgb, var(--color-primary) 8%, transparent);
+  box-shadow:
+    0 20px 48px
+      color-mix(in srgb, var(--color-surface-container-lowest) 80%, transparent),
+    0 4px 16px color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 /* ── Video card play icon overlay ──────────────── */
 .video-card__play-icon {
   opacity: 0;
   transform: scale(0.85);
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .video-card:hover .video-card__play-icon {
@@ -214,7 +288,11 @@ nav a[data-active="true"]::after {
 }
 
 .filter-pill.active {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-container)
+  );
   color: var(--color-surface);
   border-color: transparent !important;
 }
@@ -239,7 +317,11 @@ nav a[data-active="true"]::after {
   width: clamp(300px, 60vw, 600px);
   height: clamp(200px, 40vw, 400px);
   border-radius: 9999px;
-  background: radial-gradient(ellipse, color-mix(in srgb, var(--color-primary) 7%, transparent) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse,
+    color-mix(in srgb, var(--color-primary) 7%, transparent) 0%,
+    transparent 70%
+  );
   pointer-events: none;
   z-index: 0;
 }
