@@ -9,7 +9,15 @@ interface Props {
   hidden?: boolean;
 }
 
-const { id, title, category, playbackId, poster, meta, hidden = false } = Astro.props;
+const {
+  id,
+  title,
+  category,
+  playbackId,
+  poster,
+  meta,
+  hidden = false,
+} = Astro.props;
 
 // Fallback chain: explicit prop → Mux thumbnail → local placeholder
 const resolvedPoster =
@@ -19,63 +27,84 @@ const resolvedPoster =
 ---
 
 <article
-  class="video-card relative rounded-lg overflow-hidden ghost-border cursor-pointer group"
+  class='video-card relative rounded-lg overflow-hidden ghost-border cursor-pointer group'
   data-id={id}
   data-category={category}
   data-hidden={hidden ? 'true' : 'false'}
   data-playback-id={playbackId}
   data-title={title}
   data-meta={meta}
-  style="background: var(--color-surface-container-lowest);"
+  style='background: var(--color-surface-container-lowest);'
   aria-label={`${title} — ${category}`}
-  role="button"
-  tabindex="0"
->
+  role='button'
+  tabindex='0'>
   <!-- Skeleton placeholder -->
   <div
-    class="skeleton absolute inset-0 z-10 rounded-lg transition-opacity duration-500"
+    class='skeleton absolute inset-0 z-10 rounded-lg transition-opacity duration-500'
     data-skeleton
-    aria-hidden="true"
-  ></div>
+    aria-hidden='true'>
+  </div>
 
   <!-- Video / Poster -->
-  {playbackId ? (
-    <mux-player
-      class="w-full aspect-video block"
-      playback-id={playbackId}
-      poster={resolvedPoster}
-      muted
-      playsinline
-      preload="none"
-      stream-type="on-demand"
-      tabindex="-1"
-      aria-label={title}
-      data-video
-      style="--controls: none; --media-object-fit: cover;"
-    ></mux-player>
-  ) : (
-    <img
-      class="w-full aspect-video object-cover block"
-      src={resolvedPoster}
-      alt={title}
-      loading="lazy"
-      aria-hidden="true"
-    />
-  )}
+  {
+    playbackId ? (
+      <mux-player
+        class='w-full aspect-video block'
+        playback-id={playbackId}
+        poster={resolvedPoster}
+        muted
+        playsinline
+        preload='none'
+        stream-type='on-demand'
+        tabindex='-1'
+        aria-label={title}
+        data-video
+        style='--controls: none; --media-object-fit: cover;'
+      />
+    ) : (
+      <img
+        class='w-full aspect-video object-cover block'
+        src={resolvedPoster}
+        alt={title}
+        loading='lazy'
+        aria-hidden='true'
+      />
+    )
+  }
+
+  <!-- Play icon overlay (fades in on hover via CSS) -->
+  <div
+    class='video-card__play-icon absolute inset-0 z-15 flex items-center justify-center pointer-events-none'
+    aria-hidden='true'>
+    <div
+      class='w-14 h-14 rounded-full flex items-center justify-center'
+      style='background: rgba(0,0,0,0.42); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(171,206,197,0.25);'>
+      <svg
+        width='20'
+        height='20'
+        viewBox='0 0 20 20'
+        fill='none'
+        aria-hidden='true'>
+        <path d='M6 4.5l11 5.5-11 5.5V4.5z' fill='#abcec5'></path>
+      </svg>
+    </div>
+  </div>
 
   <!-- Overlay info -->
   <div
-    class="absolute bottom-0 left-0 right-0 p-4 z-20"
-    style="background: linear-gradient(to top, color-mix(in srgb, var(--color-surface-container-lowest) 90%, transparent), transparent);"
-  >
+    class='absolute bottom-0 left-0 right-0 p-4 z-20'
+    style='background: linear-gradient(to top, color-mix(in srgb, var(--color-surface-container-lowest) 95%, transparent) 0%, color-mix(in srgb, var(--color-surface-container-lowest) 60%, transparent) 50%, transparent 100%);'>
     <p
-      class="text-xs uppercase tracking-widest mb-1"
-      style="color: var(--color-primary); letter-spacing: 0.15em;"
-    >
+      class='text-xs uppercase tracking-widest mb-1'
+      style='color: var(--color-primary); letter-spacing: 0.15em;'>
       {category}
     </p>
-    <h3 class="font-display text-sm font-semibold text-on-surface leading-snug">{title}</h3>
-    <p class="text-xs mt-1" style="color: var(--color-on-surface-variant);">{meta}</p>
+    <h3 class='font-display text-sm font-semibold text-on-surface leading-snug'>
+      {title}
+    </h3>
+    <p class='text-xs mt-1' style='color: var(--color-on-surface-variant);'>
+      {meta}
+    </p>
   </div>
 </article>
 

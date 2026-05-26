@@ -228,14 +228,18 @@ const INITIAL_VISIBLE = 4;
           >
             About
           </p>
-          <h2
-            class="font-display font-bold text-on-surface mb-6 leading-tight"
-            style="font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em;"
-          >
-            Every frame is<br />a decision.
-          </h2>
+          <!-- Left accent bar + heading -->
+          <div class="flex gap-4 items-stretch mb-6">
+            <span class="about-accent-bar" aria-hidden="true"></span>
+            <h2
+              class="font-display font-bold text-on-surface leading-tight"
+              style="font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em;"
+            >
+              Every frame is<br />a decision.
+            </h2>
+          </div>
           <p class="text-base leading-relaxed mb-4" style="color: var(--color-on-surface-variant);">
-            I believe stories aren’t just seen, they’re felt. As a filmmaker, editor, and creative originally from Colombia, based in Atlanta, I bridge the gap between imagination and high end production. For over seven years, I’ve specialized in crafting commercial, corporate, and branded content that blends cinematic atmosphere with authentic storytelling.
+            I believe stories aren't just seen, they're felt. As a filmmaker, editor, and creative originally from Colombia, based in Atlanta, I bridge the gap between imagination and high end production. For over seven years, I've specialized in crafting commercial, corporate, and branded content that blends cinematic atmosphere with authentic storytelling.
           </p>
           <p class="text-base leading-relaxed mb-8" style="color: var(--color-on-surface-variant);">
 From concept development to the final edit, I immerse myself in every step of the process, cinematography, direction, and post production, turning bold ideas into striking visuals that resonate, inspire, and leave a lasting impact.
@@ -302,7 +306,7 @@ From concept development to the final edit, I immerse myself in every step of th
             {categories.map((cat, i) => (
               <button
                 type="button"
-                class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
+                class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
                 data-filter={cat}
                 aria-pressed={i === 0 ? 'true' : 'false'}
                 style={i !== 0 ? `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);` : ''}
@@ -353,10 +357,13 @@ From concept development to the final edit, I immerse myself in every step of th
     <section
       id="contact"
       aria-label="Contact"
-      class="px-6 md:px-12 py-24 md:py-32"
+      class="relative px-6 md:px-12 py-24 md:py-32 overflow-hidden"
       style="background: var(--color-surface-container-lowest);"
     >
-      <div class="max-w-2xl mx-auto text-center">
+      <!-- Ambient glow -->
+      <div class="contact-glow" aria-hidden="true"></div>
+
+      <div class="relative z-10 max-w-2xl mx-auto text-center">
         <p
           class="text-xs uppercase tracking-widest mb-6"
           style="color: var(--color-primary); letter-spacing: 0.15em;"
@@ -390,8 +397,14 @@ From concept development to the final edit, I immerse myself in every step of th
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Daniel Gualdron on Instagram (opens in new tab)"
-            class="text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            class="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
+            <!-- Instagram icon -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+            </svg>
             Instagram
           </a>
           <div class="w-px h-4" style="background: var(--color-outline-variant);" aria-hidden="true"></div>
@@ -400,8 +413,14 @@ From concept development to the final edit, I immerse myself in every step of th
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Daniel Gualdron on LinkedIn (opens in new tab)"
-            class="text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            class="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
+            <!-- LinkedIn icon -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect x="2" y="9" width="4" height="12"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
             LinkedIn
           </a>
         </div>
@@ -513,17 +532,19 @@ From concept development to the final edit, I immerse myself in every step of th
   const siteHeader = document.querySelector('body > header');
 
   if (preloader) {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const nameEl = preloader.querySelector('h1');
+    // Capture narrowed reference so setTimeout/event callbacks retain non-null type.
+    const preloaderEl          = preloader;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const preloaderHeadingEl   = preloaderEl.querySelector('h1');
 
-    if (nameEl) {
-      if (prefersReduced) {
-        nameEl.animate(
+    if (preloaderHeadingEl) {
+      if (prefersReducedMotion) {
+        preloaderHeadingEl.animate(
           [{ opacity: 0 }, { opacity: 1 }],
           { duration: 800, easing: 'ease-out', fill: 'forwards' }
         );
       } else {
-        nameEl.animate(
+        preloaderHeadingEl.animate(
           [
             { opacity: 0, transform: 'translateY(80px) scale(0.85)' },
             { opacity: 1, transform: 'translateY(0px)  scale(1)'    },
@@ -533,21 +554,21 @@ From concept development to the final edit, I immerse myself in every step of th
       }
     }
 
-    const holdDelay = prefersReduced ? 1000 : 5500;
+    const preloaderHoldDelayMs = prefersReducedMotion ? 1000 : 5500;
 
     setTimeout(() => {
-      preloader.classList.add('done');
+      preloaderEl.classList.add('done');
 
       setTimeout(() => {
         if (pageWrap)   pageWrap.classList.add('revealed');
         if (siteHeader) siteHeader.classList.add('revealed');
-      }, prefersReduced ? 0 : 900);
+      }, prefersReducedMotion ? 0 : 900);
 
-      preloader.addEventListener('animationend', (e) => {
+      preloaderEl.addEventListener('animationend', (e) => {
         if (e.animationName !== 'fadeOut') return;
-        preloader.remove();
+        preloaderEl.remove();
       }, { once: true });
-    }, holdDelay);
+    }, preloaderHoldDelayMs);
   }
 
   const filterGroup   = document.getElementById('filter-group');
@@ -557,15 +578,15 @@ From concept development to the final edit, I immerse myself in every step of th
   const INACTIVE_PILL_STYLE   = 'border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);';
   const FOCUSABLE_SELECTOR    = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-  let expanded = false;
+  let isGridExpanded = false;
 
   function cardMatchesFilter(card: HTMLElement, filter: string): boolean {
     return filter === 'All' || card.dataset.category === filter;
   }
 
   function getActiveFilter(): string {
-    const activepill = filterGroup?.querySelector('.filter-pill.active');
-    return (activepill instanceof HTMLElement ? activepill.dataset.filter : null) ?? 'All';
+    const activePillEl = filterGroup?.querySelector('.filter-pill.active');
+    return (activePillEl instanceof HTMLElement ? activePillEl.dataset.filter : null) ?? 'All';
   }
 
   function collapseGrid(filter: string) {
@@ -580,7 +601,7 @@ From concept development to the final edit, I immerse myself in every step of th
     });
   }
 
-  function syncViewAllBtn(filter: string) {
+  function syncViewAllButton(filter: string) {
     if (!viewAllBtn || !videoGrid) return;
     let matchCount = 0;
     videoGrid.querySelectorAll('.video-card').forEach((card) => {
@@ -592,14 +613,19 @@ From concept development to the final edit, I immerse myself in every step of th
   }
 
   if (filterGroup && videoGrid) {
-    filterGroup.addEventListener('click', (e) => {
+    // Capture narrowed references in block-scoped consts so closures
+    // inherit the non-null type and TS doesn't re-widen them.
+    const filterGroupEl = filterGroup;
+    const videoGridEl   = videoGrid;
+
+    filterGroupEl.addEventListener('click', (e) => {
       if (!(e.target instanceof HTMLElement)) return;
       const clickedPill = e.target.closest('.filter-pill');
       if (!(clickedPill instanceof HTMLElement)) return;
 
-      const filter = clickedPill.dataset.filter ?? 'All';
+      const selectedFilter = clickedPill.dataset.filter ?? 'All';
 
-      filterGroup.querySelectorAll('.filter-pill').forEach((pill) => {
+      filterGroupEl.querySelectorAll('.filter-pill').forEach((pill) => {
         const isActive = pill === clickedPill;
         pill.classList.toggle('active', isActive);
         pill.setAttribute('aria-pressed', String(isActive));
@@ -608,35 +634,39 @@ From concept development to the final edit, I immerse myself in every step of th
         }
       });
 
-      videoGrid.querySelectorAll('.video-card').forEach((card) => {
+      videoGridEl.querySelectorAll('.video-card').forEach((card) => {
         if (!(card instanceof HTMLElement)) return;
-        card.dataset.hidden = cardMatchesFilter(card, filter) ? 'false' : 'true';
+        card.dataset.hidden = cardMatchesFilter(card, selectedFilter) ? 'false' : 'true';
       });
 
-      expanded = false;
-      collapseGrid(filter);
-      syncViewAllBtn(filter);
+      isGridExpanded = false;
+      collapseGrid(selectedFilter);
+      syncViewAllButton(selectedFilter);
     });
   }
 
   // View All / Show Less toggle
   if (viewAllBtn && videoGrid) {
-    viewAllBtn.addEventListener('click', () => {
-      const filter = getActiveFilter();
-      if (!expanded) {
-        videoGrid.querySelectorAll('.video-card').forEach((card) => {
-          if (card instanceof HTMLElement && cardMatchesFilter(card, filter)) {
+    // Capture narrowed references so the click callback retains non-null types.
+    const viewAllButtonEl = viewAllBtn;
+    const videoGridEl     = videoGrid;
+
+    viewAllButtonEl.addEventListener('click', () => {
+      const activeFilter = getActiveFilter();
+      if (!isGridExpanded) {
+        videoGridEl.querySelectorAll('.video-card').forEach((card) => {
+          if (card instanceof HTMLElement && cardMatchesFilter(card, activeFilter)) {
             card.dataset.hidden = 'false';
           }
         });
-        viewAllBtn.textContent = 'Show Less';
-        viewAllBtn.setAttribute('aria-label', 'Show fewer videos');
-        expanded = true;
+        viewAllButtonEl.textContent = 'Show Less';
+        viewAllButtonEl.setAttribute('aria-label', 'Show fewer videos');
+        isGridExpanded = true;
       } else {
-        collapseGrid(filter);
-        viewAllBtn.textContent = 'View All Work';
-        viewAllBtn.setAttribute('aria-label', 'Show all cinematography work');
-        expanded = false;
+        collapseGrid(activeFilter);
+        viewAllButtonEl.textContent = 'View All Work';
+        viewAllButtonEl.setAttribute('aria-label', 'Show all cinematography work');
+        isGridExpanded = false;
       }
     });
   }
@@ -652,90 +682,99 @@ From concept development to the final edit, I immerse myself in every step of th
   const modalCatEl   = document.getElementById('modal-category');
 
   if (modal && backdrop && modalInner && modalPlayer && modalClose) {
-    const player = modalPlayer as HTMLElement & { pause?: () => void };
+    // Capture all narrowed references as block-scoped consts so named functions
+    // (openModal, closeModal, trapFocus) and their inner callbacks (rAF, setTimeout)
+    // all retain non-null types — consistent with how `player` is already handled.
+    const modalEl       = modal;
+    const backdropEl    = backdrop;
+    const modalPanelEl  = modalInner;
+    const closeButtonEl = modalClose;
+    const player        = modalPlayer as HTMLElement & { pause?: () => void };
 
-    let isOpen = false;
-    let lastFocused: Element | null = null;
+    let isModalOpen                             = false;
+    let previouslyFocusedElement: Element | null = null;
 
     function openModal(detail: { playbackId: string; title: string; meta: string; category: string; rect: DOMRect }) {
       const { playbackId, title, meta, category, rect } = detail;
-      if (!playbackId || isOpen) return;
-      isOpen = true;
-      lastFocused = document.activeElement;
+      if (!playbackId || isModalOpen) return;
+      isModalOpen = true;
+      previouslyFocusedElement = document.activeElement;
 
       if (modalTitleEl) modalTitleEl.textContent = title;
       if (modalMetaEl)  modalMetaEl.textContent  = meta;
       if (modalCatEl)   modalCatEl.textContent   = category;
       player.setAttribute('playback-id', playbackId);
 
-      modal.classList.remove('hidden');
-      modalInner.style.transition = 'none';
-      modalInner.style.transform  = 'translate(-50%, -50%)';
-      modalInner.style.opacity    = '0';
-      backdrop.style.transition   = 'none';
-      backdrop.style.opacity      = '0';
-      modal.style.pointerEvents   = 'none';
+      modalEl.classList.remove('hidden');
+      modalPanelEl.style.transition = 'none';
+      modalPanelEl.style.transform  = 'translate(-50%, -50%)';
+      modalPanelEl.style.opacity    = '0';
+      backdropEl.style.transition   = 'none';
+      backdropEl.style.opacity      = '0';
+      modalEl.style.pointerEvents   = 'none';
 
-      void modalInner.offsetHeight;
-      const innerRect = modalInner.getBoundingClientRect();
+      void modalPanelEl.offsetHeight;
+      const panelRect = modalPanelEl.getBoundingClientRect();
 
-      const scaleX = rect.width  / innerRect.width;
-      const scaleY = rect.height / innerRect.height;
-      const tx     = (rect.left + rect.width  / 2) - (window.innerWidth  / 2);
-      const ty     = (rect.top  + rect.height / 2) - (window.innerHeight / 2);
+      const scaleX  = rect.width  / panelRect.width;
+      const scaleY  = rect.height / panelRect.height;
+      const offsetX = (rect.left + rect.width  / 2) - (window.innerWidth  / 2);
+      const offsetY = (rect.top  + rect.height / 2) - (window.innerHeight / 2);
 
-      modalInner.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scaleX}, ${scaleY})`;
-      modalInner.style.opacity   = '1';
+      modalPanelEl.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scaleX}, ${scaleY})`;
+      modalPanelEl.style.opacity   = '1';
 
       document.body.style.overflow = 'hidden';
       pageWrap?.classList.add('modal-open');
       pageWrap?.setAttribute('inert', '');
 
-      void modalInner.offsetHeight;
+      void modalPanelEl.offsetHeight;
 
       requestAnimationFrame(() => {
-        modalInner.style.transition = 'transform 0.46s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease';
-        modalInner.style.transform  = 'translate(-50%, -50%)';
-        backdrop.style.transition   = 'opacity 0.35s ease';
-        backdrop.style.opacity      = '1';
-        modal.style.pointerEvents   = 'auto';
+        modalPanelEl.style.transition = 'transform 0.46s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease';
+        modalPanelEl.style.transform  = 'translate(-50%, -50%)';
+        backdropEl.style.transition   = 'opacity 0.35s ease';
+        backdropEl.style.opacity      = '1';
+        modalEl.style.pointerEvents   = 'auto';
       });
 
-      setTimeout(() => modalClose.focus(), 480);
+      setTimeout(() => closeButtonEl.focus(), 480);
     }
 
     function closeModal() {
-      if (!isOpen) return;
-      isOpen = false;
-      modal.style.pointerEvents = 'none';
+      if (!isModalOpen) return;
+      isModalOpen = false;
+      modalEl.style.pointerEvents = 'none';
 
       try { player.pause?.(); } catch (_) {}
 
-      modalInner.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
-      modalInner.style.transform  = 'translate(-50%, -50%) scale(0.94)';
-      modalInner.style.opacity    = '0';
-      backdrop.style.transition   = 'opacity 0.28s ease';
-      backdrop.style.opacity      = '0';
+      modalPanelEl.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
+      modalPanelEl.style.transform  = 'translate(-50%, -50%) scale(0.94)';
+      modalPanelEl.style.opacity    = '0';
+      backdropEl.style.transition   = 'opacity 0.28s ease';
+      backdropEl.style.opacity      = '0';
 
       setTimeout(() => {
-        modal.classList.add('hidden');
+        modalEl.classList.add('hidden');
         player.removeAttribute('playback-id');
         document.body.style.overflow = '';
         pageWrap?.classList.remove('modal-open');
         pageWrap?.removeAttribute('inert');
-        if (lastFocused instanceof HTMLElement) lastFocused.focus();
+        if (previouslyFocusedElement instanceof HTMLElement) previouslyFocusedElement.focus();
       }, 320);
     }
 
     function trapFocus(e: KeyboardEvent) {
       const focusableElements = Array.from(
-        modal.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+        modalEl.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
       ).filter((el) => !el.closest('[hidden]') && el.offsetParent !== null);
 
       if (focusableElements.length === 0) { e.preventDefault(); return; }
 
-      const firstFocusable = focusableElements[0];
-      const lastFocusable  = focusableElements[focusableElements.length - 1];
+      // Array is proven non-empty by the length guard above;
+      // non-null assertions are safe and avoid redundant runtime checks.
+      const firstFocusable = focusableElements[0]!;
+      const lastFocusable  = focusableElements[focusableElements.length - 1]!;
 
       if (e.shiftKey) {
         if (document.activeElement === firstFocusable) { e.preventDefault(); lastFocusable.focus(); }
@@ -748,17 +787,16 @@ From concept development to the final edit, I immerse myself in every step of th
       openModal((e as CustomEvent<{ playbackId: string; title: string; meta: string; category: string; rect: DOMRect }>).detail);
     });
 
-    modalClose.addEventListener('click', closeModal);
+    closeButtonEl.addEventListener('click', closeModal);
 
-    modal.addEventListener('click', (e) => {
-      if (!modalInner.contains(e.target as Node | null)) closeModal();
+    modalEl.addEventListener('click', (e) => {
+      if (!modalPanelEl.contains(e.target as Node | null)) closeModal();
     });
 
     document.addEventListener('keydown', (e) => {
-      if (!isOpen) return;
+      if (!isModalOpen) return;
       if (e.key === 'Escape') { closeModal(); return; }
       if (e.key === 'Tab') trapFocus(e);
     });
   }
 </script>
-
