@@ -61,6 +61,12 @@ h1, h2, h3, h4, h5, h6 {
   animation: marquee 28s linear infinite;
 }
 
+@media (max-width: 640px) {
+  .animate-marquee {
+    animation-duration: 44s;
+  }
+}
+
 /* ── Preloader ──────────────────────────────────── */
 @keyframes fadeOut {
   from { opacity: 1; }
@@ -107,6 +113,31 @@ body > header.revealed {
   opacity: 1;
 }
 
+/* ── Navbar scrolled state ──────────────────────── */
+body > header nav.scrolled {
+  background: color-mix(in srgb, var(--color-surface-variant) 85%, transparent) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-outline-variant) 18%, transparent);
+  transition: background 0.3s ease, border-bottom 0.3s ease;
+}
+
+/* ── Navbar active link dot ─────────────────────── */
+nav a[data-active="true"] {
+  color: var(--color-on-surface);
+  position: relative;
+}
+
+nav a[data-active="true"]::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  translate: -50% 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--color-primary);
+}
+
 @media (prefers-reduced-motion: reduce) {
   #preloader.done { opacity: 0; pointer-events: none; }
   #page-wrap      { clip-path: none; }
@@ -132,8 +163,9 @@ body > header.revealed {
 }
 
 /* ── Ghost border (hover) ───────────────────────── */
+/* Raised from 15% → 25% so the outline is actually perceptible */
 .ghost-border:hover {
-  outline: 1px solid color-mix(in srgb, var(--color-outline-variant) 15%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-outline-variant) 25%, transparent);
 }
 
 /* ── Portrait hover ─────────────────────────────── */
@@ -150,8 +182,64 @@ body > header.revealed {
   display: none;
 }
 
-/* ── Filter pill active ─────────────────────────── */
+/* Lift on hover — transform GPU-composited for smoothness */
+.video-card {
+  will-change: transform;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.video-card:hover {
+  transform: translateY(-4px) scale(1.012);
+  box-shadow: 0 20px 48px color-mix(in srgb, var(--color-surface-container-lowest) 80%, transparent),
+              0 4px 16px color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+/* ── Video card play icon overlay ──────────────── */
+.video-card__play-icon {
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.video-card:hover .video-card__play-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Filter pill ────────────────────────────────── */
+/* Base "tray" so inactive pills have a visible surface */
+.filter-pill {
+  background: color-mix(in srgb, var(--color-on-surface) 4%, transparent);
+}
+
 .filter-pill.active {
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
   color: var(--color-surface);
+  border-color: transparent !important;
+}
+
+/* ── About accent bar ───────────────────────────── */
+.about-accent-bar {
+  display: block;
+  width: 2px;
+  height: 100%;
+  min-height: 3rem;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, var(--color-primary), transparent);
+  flex-shrink: 0;
+}
+
+/* ── Contact section ambient glow ───────────────── */
+.contact-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -60%;
+  width: clamp(300px, 60vw, 600px);
+  height: clamp(200px, 40vw, 400px);
+  border-radius: 9999px;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--color-primary) 7%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }

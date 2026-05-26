@@ -228,12 +228,16 @@ const INITIAL_VISIBLE = 4;
           >
             About
           </p>
-          <h2
-            class="font-display font-bold text-on-surface mb-6 leading-tight"
-            style="font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em;"
-          >
-            Every frame is<br />a decision.
-          </h2>
+          <!-- Left accent bar + heading -->
+          <div class="flex gap-4 items-stretch mb-6">
+            <span class="about-accent-bar" aria-hidden="true"></span>
+            <h2
+              class="font-display font-bold text-on-surface leading-tight"
+              style="font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em;"
+            >
+              Every frame is<br />a decision.
+            </h2>
+          </div>
           <p class="text-base leading-relaxed mb-4" style="color: var(--color-on-surface-variant);">
             I believe stories aren’t just seen, they’re felt. As a filmmaker, editor, and creative originally from Colombia, based in Atlanta, I bridge the gap between imagination and high end production. For over seven years, I’ve specialized in crafting commercial, corporate, and branded content that blends cinematic atmosphere with authentic storytelling.
           </p>
@@ -302,7 +306,7 @@ From concept development to the final edit, I immerse myself in every step of th
             {categories.map((cat, i) => (
               <button
                 type="button"
-                class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
+                class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
                 data-filter={cat}
                 aria-pressed={i === 0 ? 'true' : 'false'}
                 style={i !== 0 ? `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);` : ''}
@@ -353,10 +357,13 @@ From concept development to the final edit, I immerse myself in every step of th
     <section
       id="contact"
       aria-label="Contact"
-      class="px-6 md:px-12 py-24 md:py-32"
+      class="relative px-6 md:px-12 py-24 md:py-32 overflow-hidden"
       style="background: var(--color-surface-container-lowest);"
     >
-      <div class="max-w-2xl mx-auto text-center">
+      <!-- Ambient glow -->
+      <div class="contact-glow" aria-hidden="true"></div>
+
+      <div class="relative z-10 max-w-2xl mx-auto text-center">
         <p
           class="text-xs uppercase tracking-widest mb-6"
           style="color: var(--color-primary); letter-spacing: 0.15em;"
@@ -390,8 +397,14 @@ From concept development to the final edit, I immerse myself in every step of th
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Daniel Gualdron on Instagram (opens in new tab)"
-            class="text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            class="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
+            <!-- Instagram icon -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+            </svg>
             Instagram
           </a>
           <div class="w-px h-4" style="background: var(--color-outline-variant);" aria-hidden="true"></div>
@@ -400,8 +413,14 @@ From concept development to the final edit, I immerse myself in every step of th
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Daniel Gualdron on LinkedIn (opens in new tab)"
-            class="text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            class="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
+            <!-- LinkedIn icon -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+              <rect x="2" y="9" width="4" height="12"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
             LinkedIn
           </a>
         </div>

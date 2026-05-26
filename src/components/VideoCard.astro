@@ -63,10 +63,25 @@ const resolvedPoster =
     />
   )}
 
+  <!-- Play icon overlay (fades in on hover via CSS) -->
+  <div
+    class="video-card__play-icon absolute inset-0 z-15 flex items-center justify-center pointer-events-none"
+    aria-hidden="true"
+  >
+    <div
+      class="w-14 h-14 rounded-full flex items-center justify-center"
+      style="background: rgba(0,0,0,0.42); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(171,206,197,0.25);"
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M6 4.5l11 5.5-11 5.5V4.5z" fill="#abcec5" />
+      </svg>
+    </div>
+  </div>
+
   <!-- Overlay info -->
   <div
     class="absolute bottom-0 left-0 right-0 p-4 z-20"
-    style="background: linear-gradient(to top, color-mix(in srgb, var(--color-surface-container-lowest) 90%, transparent), transparent);"
+    style="background: linear-gradient(to top, color-mix(in srgb, var(--color-surface-container-lowest) 95%, transparent) 0%, color-mix(in srgb, var(--color-surface-container-lowest) 60%, transparent) 50%, transparent 100%);"
   >
     <p
       class="text-xs uppercase tracking-widest mb-1"

@@ -33,7 +33,8 @@ const { links } = Astro.props;
         <li>
           <a
             href={link.href}
-            class="text-sm text-on-surface-variant hover:text-on-surface transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            data-nav-id={link.id}
+            class="text-sm text-on-surface-variant hover:text-on-surface transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary relative pb-1.5"
           >
             {link.label}
           </a>
@@ -107,5 +108,51 @@ const { links } = Astro.props;
         toggle.focus();
       }
     });
+  }
+
+  // ── Scroll-based navbar state ────────────────────────────────────────────
+  const navEl = document.querySelector('nav[aria-label="Main navigation"]');
+
+  if (navEl) {
+    const onScroll = () => {
+      if (window.scrollY > 40) {
+        navEl.classList.add('scrolled');
+      } else {
+        navEl.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // initial check
+  }
+
+  // ── Scroll-spy: highlight active section ────────────────────────────────
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('nav a[data-nav-id]');
+
+  if (navLinks.length > 0) {
+    const sectionIds = Array.from(navLinks).map((a) => a.dataset.navId ?? '');
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const setActive = (activeId: string) => {
+      navLinks.forEach((a) => {
+        a.dataset.active = a.dataset.navId === activeId ? 'true' : 'false';
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActive(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    // Set hero as default active
+    setActive(sectionIds[0] ?? '');
   }
 </script>
