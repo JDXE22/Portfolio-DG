@@ -28,80 +28,79 @@ const logos = [
 
 const categories = ['All', 'Commercial', 'Interview', 'Art', 'Social', 'Narrative'];
 
+// TODO: Replace each youtubeId with the real YouTube video ID after upload
+// Format: 11-character ID from youtube.com/watch?v=XXXXXXXXXXX
 const videos = [
   {
     id: 'v1',
     title: '8th Insignia',
     category: 'Art',
-    playbackId: 'Zuf93jaGQ00Wot7PQKK010202IgsOnLiNkFfDVlqYhIWOaw',
+    youtubeId: 'PLACEHOLDER_V1',
     meta: '1080p • ANAMORPHIC • 2026',
   },
   {
     id: 'v2',
     title: 'STUDIO SESSION FINAL V2',
     category: 'Art',
-    playbackId: 'V5l6q2400GsVt2TAtU00gKQEJIRVip02iy8rSFOC00maKJ8',
+    youtubeId: 'PLACEHOLDER_V2',
     meta: '1080p • SPHERICAL • 2024',
   },
   {
     id: 'v3',
     title: 'Resurgens Orthopedics: Adonis',
     category: 'Commercial',
-    playbackId: 'swXS5EuMOFje1FAerjKSjAm301HVtY01cYxLGrSODyF8s',
+    youtubeId: 'PLACEHOLDER_V3',
     meta: '1080p • ANAMORPHIC • 2023',
   },
   {
     id: 'v4',
     title: 'Resurgens Orthopedics: Loren',
     category: 'Commercial',
-    playbackId: 'zUCj35GQ1kkmnbaLwNfS7pEZyGmqo9NiDdiJVWJQh28',
+    youtubeId: 'PLACEHOLDER_V4',
     meta: '1080p • SPHERICAL • 2024',
   },
   {
     id: 'v5',
     title: 'ESnH',
     category: 'Interview',
-    playbackId: '02Y4mVaFw52iGqinjY0102sTnELxMAmZQNv4Ol3yScSlUE',
+    youtubeId: 'PLACEHOLDER_V5',
     meta: '1080p • ANAMORPHIC • 2023',
   },
   {
     id: 'v6',
     title: 'Resurgens Orthopedics: Spine Center',
     category: 'Interview',
-    playbackId: 'voTUPIIVO501IqX9rTOh7g01HYgU1YAil2q468Vsn4o3Y',
+    youtubeId: 'PLACEHOLDER_V6',
     meta: '1080p • SPHERICAL • 2024',
   },
-
   {
     id: 'v7',
     title: 'Atlanta Fanzone',
     category: 'Social',
-    playbackId: '2V0000Zo88ubbf8QSD67Gzjane01w7UrJOvDs8tWVezvco',
+    youtubeId: 'PLACEHOLDER_V7',
     meta: '1080p • ANAMORPHIC • 2026',
   },
   {
     id: 'v8',
     title: 'Camp Southern Ground: Land of Transformation',
     category: 'Narrative',
-    playbackId: 'oV01KEu7T9hUXFQH85ykBk6AyV301uvs9TqM81lWm34mM',
+    youtubeId: 'PLACEHOLDER_V8',
     meta: '1080p • SPHERICAL • 2026',
   },
-
   {
     id: 'v9',
     title: 'Georgia Heart Video Campaign',
     category: 'Narrative',
-    playbackId: 'iWy7UJZdM8aWl1MAEFNJoMIKF00RvDQXUfUpniZMrgus',
+    youtubeId: 'PLACEHOLDER_V9',
     meta: '1080p • ANAMORPHIC • 2026',
   },
-
   {
     id: 'v10',
     title: 'SPM',
     category: 'Social',
-    playbackId: 'NIO97BZzvcJ6t51PRAA6AetnBxQGZHFRU01puxL9BBfI',
+    youtubeId: 'PLACEHOLDER_V10',
     meta: '1080p • ANAMORPHIC • 2026',
-  }
+  },
 ];
 
 const INITIAL_VISIBLE = 4;
@@ -330,7 +329,7 @@ From concept development to the final edit, I immerse myself in every step of th
                 id={v.id}
                 title={v.title}
                 category={v.category}
-                playbackId={v.playbackId}
+                youtubeId={v.youtubeId}
                 meta={v.meta}
                 hidden={i >= INITIAL_VISIBLE}
               />
@@ -477,15 +476,12 @@ From concept development to the final edit, I immerse myself in every step of th
         </svg>
       </button>
 
-      <!-- Mux player (controls visible by default) -->
-      <mux-player
-        id="modal-player"
+      <!-- YouTube iframe container (iframe injected on open, destroyed on close) -->
+      <div
+        id="modal-player-container"
         class="w-full block"
-        stream-type="on-demand"
-        playsinline
-        preload="none"
-        style="aspect-ratio: 16/9; display: block; --media-object-fit: contain;"
-      ></mux-player>
+        style="aspect-ratio: 16/9; background: #000;"
+      ></div>
 
       <!-- Info bar -->
       <div
@@ -672,38 +668,69 @@ From concept development to the final edit, I immerse myself in every step of th
   }
 
   // ── Video Modal ──────────────────────────────────────────────────────────
-  const modal        = document.getElementById('video-modal');
-  const backdrop     = document.getElementById('modal-backdrop');
-  const modalInner   = document.getElementById('modal-inner');
-  const modalPlayer  = document.getElementById('modal-player');
-  const modalClose   = document.getElementById('modal-close');
-  const modalTitleEl = document.getElementById('modal-title');
-  const modalMetaEl  = document.getElementById('modal-meta');
-  const modalCatEl   = document.getElementById('modal-category');
+  const modal            = document.getElementById('video-modal');
+  const backdrop         = document.getElementById('modal-backdrop');
+  const modalInner       = document.getElementById('modal-inner');
+  const playerContainer  = document.getElementById('modal-player-container');
+  const modalClose       = document.getElementById('modal-close');
+  const modalTitleEl     = document.getElementById('modal-title');
+  const modalMetaEl      = document.getElementById('modal-meta');
+  const modalCatEl       = document.getElementById('modal-category');
 
-  if (modal && backdrop && modalInner && modalPlayer && modalClose) {
-    // Capture all narrowed references as block-scoped consts so named functions
-    // (openModal, closeModal, trapFocus) and their inner callbacks (rAF, setTimeout)
-    // all retain non-null types — consistent with how `player` is already handled.
-    const modalEl       = modal;
-    const backdropEl    = backdrop;
-    const modalPanelEl  = modalInner;
-    const closeButtonEl = modalClose;
-    const player        = modalPlayer as HTMLElement & { pause?: () => void };
+  if (modal && backdrop && modalInner && playerContainer && modalClose) {
+    // Capture narrowed references as block-scoped consts so named functions
+    // and their inner callbacks retain non-null types.
+    const modalEl          = modal;
+    const backdropEl       = backdrop;
+    const modalPanelEl     = modalInner;
+    const closeButtonEl    = modalClose;
+    const containerEl      = playerContainer;
 
     let isModalOpen                             = false;
     let previouslyFocusedElement: Element | null = null;
 
-    function openModal(detail: { playbackId: string; title: string; meta: string; category: string; rect: DOMRect }) {
-      const { playbackId, title, meta, category, rect } = detail;
-      if (!playbackId || isModalOpen) return;
+    /** Build the YouTube embed URL with privacy-friendly defaults. */
+    function buildYouTubeEmbedUrl(videoId: string): string {
+      const params = new URLSearchParams({
+        autoplay: '1',
+        rel:      '0',
+        modestbranding: '1',
+        playsinline:    '1',
+      });
+      return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+    }
+
+    /** Create and inject a YouTube IFrame into the container. */
+    function injectYouTubeIframe(videoId: string, videoTitle: string): void {
+      const iframe = document.createElement('iframe');
+      iframe.src             = buildYouTubeEmbedUrl(videoId);
+      iframe.title           = videoTitle;
+      iframe.width           = '100%';
+      iframe.height          = '100%';
+      iframe.style.border    = 'none';
+      iframe.style.display   = 'block';
+      iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('loading', 'lazy');
+      containerEl.appendChild(iframe);
+    }
+
+    /** Remove the YouTube IFrame from the container to stop playback. */
+    function destroyYouTubeIframe(): void {
+      containerEl.innerHTML = '';
+    }
+
+    function openModal(detail: { youtubeId: string; title: string; meta: string; category: string; rect: DOMRect }) {
+      const { youtubeId, title, meta, category, rect } = detail;
+      if (!youtubeId || isModalOpen) return;
       isModalOpen = true;
       previouslyFocusedElement = document.activeElement;
 
       if (modalTitleEl) modalTitleEl.textContent = title;
       if (modalMetaEl)  modalMetaEl.textContent  = meta;
       if (modalCatEl)   modalCatEl.textContent   = category;
-      player.setAttribute('playback-id', playbackId);
+
+      injectYouTubeIframe(youtubeId, title);
 
       modalEl.classList.remove('hidden');
       modalPanelEl.style.transition = 'none';
@@ -746,8 +773,6 @@ From concept development to the final edit, I immerse myself in every step of th
       isModalOpen = false;
       modalEl.style.pointerEvents = 'none';
 
-      try { player.pause?.(); } catch (_) {}
-
       modalPanelEl.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
       modalPanelEl.style.transform  = 'translate(-50%, -50%) scale(0.94)';
       modalPanelEl.style.opacity    = '0';
@@ -756,7 +781,7 @@ From concept development to the final edit, I immerse myself in every step of th
 
       setTimeout(() => {
         modalEl.classList.add('hidden');
-        player.removeAttribute('playback-id');
+        destroyYouTubeIframe();
         document.body.style.overflow = '';
         pageWrap?.classList.remove('modal-open');
         pageWrap?.removeAttribute('inert');
@@ -784,7 +809,7 @@ From concept development to the final edit, I immerse myself in every step of th
     }
 
     document.addEventListener('video:open', (e) => {
-      openModal((e as CustomEvent<{ playbackId: string; title: string; meta: string; category: string; rect: DOMRect }>).detail);
+      openModal((e as CustomEvent<{ youtubeId: string; title: string; meta: string; category: string; rect: DOMRect }>).detail);
     });
 
     closeButtonEl.addEventListener('click', closeModal);
