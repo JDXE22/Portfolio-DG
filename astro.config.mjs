@@ -6,8 +6,6 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
-    optimizeDeps: {
-      include: ['@mux/mux-player'],
-    },
+    optimizeDeps: {},
   },
 });
