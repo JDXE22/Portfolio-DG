@@ -3,7 +3,7 @@ interface Props {
   id: string;
   title: string;
   category: string;
-  playbackId: string;
+  youtubeId: string;
   poster?: string;
   meta: string;
   hidden?: boolean;
@@ -13,16 +13,16 @@ const {
   id,
   title,
   category,
-  playbackId,
+  youtubeId,
   poster,
   meta,
   hidden = false,
 } = Astro.props;
 
-// Fallback chain: explicit prop → Mux thumbnail → local placeholder
+// Fallback chain: explicit prop → YouTube thumbnail → local placeholder
 const resolvedPoster =
   poster ||
-  (playbackId ? `https://image.mux.com/${playbackId}/thumbnail.jpg` : '') ||
+  (youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : '') ||
   '/posters/placeholder.svg';
 ---
 
@@ -31,7 +31,7 @@ const resolvedPoster =
   data-id={id}
   data-category={category}
   data-hidden={hidden ? 'true' : 'false'}
-  data-playback-id={playbackId}
+  data-youtube-id={youtubeId}
   data-title={title}
   data-meta={meta}
   style='background: var(--color-surface-container-lowest);'
@@ -45,32 +45,14 @@ const resolvedPoster =
     aria-hidden='true'>
   </div>
 
-  <!-- Video / Poster -->
-  {
-    playbackId ? (
-      <mux-player
-        class='w-full aspect-video block'
-        playback-id={playbackId}
-        poster={resolvedPoster}
-        muted
-        playsinline
-        preload='none'
-        stream-type='on-demand'
-        tabindex='-1'
-        aria-label={title}
-        data-video
-        style='--controls: none; --media-object-fit: cover;'
-      />
-    ) : (
-      <img
-        class='w-full aspect-video object-cover block'
-        src={resolvedPoster}
-        alt={title}
-        loading='lazy'
-        aria-hidden='true'
-      />
-    )
-  }
+  <!-- Thumbnail (static image — YouTube doesn't support inline silent preview) -->
+  <img
+    class='w-full aspect-video object-cover block'
+    src={resolvedPoster}
+    alt={title}
+    loading='lazy'
+    data-thumbnail
+  />
 
   <!-- Play icon overlay (fades in on hover via CSS) -->
   <div
@@ -109,52 +91,37 @@ const resolvedPoster =
 </article>
 
 <script>
-  import '@mux/mux-player';
-
   document.querySelectorAll('.video-card').forEach((card) => {
     if (!(card instanceof HTMLElement)) return;
 
-    const videoEl = card.querySelector<HTMLVideoElement>('[data-video]');
+    const thumbnailEl = card.querySelector<HTMLImageElement>('[data-thumbnail]');
     const skeleton = card.querySelector<HTMLElement>('[data-skeleton]');
 
-    // Helper: hide skeleton
     const hideSkeleton = () => {
       if (skeleton instanceof HTMLElement) skeleton.style.opacity = '0';
     };
 
-    if (!videoEl) {
+    if (!thumbnailEl) {
       hideSkeleton();
       return;
     }
 
-    const thumbnailPlaybackId = videoEl.getAttribute('playback-id');
-    if (thumbnailPlaybackId) {
-      const thumb = new Image();
-      thumb.onload = hideSkeleton;
-      thumb.onerror = hideSkeleton;
-      thumb.src = `https://image.mux.com/${thumbnailPlaybackId}/thumbnail.jpg`;
+    // Hide skeleton once thumbnail loads
+    if (thumbnailEl.complete) {
+      hideSkeleton();
+    } else {
+      thumbnailEl.addEventListener('load', hideSkeleton);
+      thumbnailEl.addEventListener('error', hideSkeleton);
     }
-    videoEl.addEventListener('canplay', hideSkeleton);
 
-    card.addEventListener('mouseenter', () => {
-      videoEl.play().catch(() => {});
-    });
-
-    card.addEventListener('mouseleave', () => {
-      videoEl.pause();
-      videoEl.currentTime = 0;
-    });
-
-    // Keyboard: focusin/focusout are now reachable because the
-    // article has tabindex="0" and role="button"
     // Click or keyboard → open modal
     const openModal = () => {
-      const playbackId = card.dataset.playbackId;
-      if (!playbackId) return;
+      const youtubeId = card.dataset.youtubeId;
+      if (!youtubeId) return;
       document.dispatchEvent(
         new CustomEvent('video:open', {
           detail: {
-            playbackId,
+            youtubeId,
             title: card.dataset.title ?? '',
             meta: card.dataset.meta ?? '',
             category: card.dataset.category ?? '',
