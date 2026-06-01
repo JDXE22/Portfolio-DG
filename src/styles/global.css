@@ -250,6 +250,11 @@ nav a[data-active='true']::after {
   display: none;
 }
 
+/* Hide grid wrapper cell when card is hidden — prevents empty column gaps */
+#video-grid > div:has(.video-card[data-hidden='true']) {
+  display: none;
+}
+
 /* Lift on hover — will-change scoped to interaction to avoid permanent GPU layer promotion */
 .video-card {
   transition:
