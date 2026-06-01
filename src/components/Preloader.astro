@@ -1,0 +1,70 @@
+---
+// no props — preloader is always the same content
+---
+
+<div
+  id='preloader'
+  aria-hidden='true'
+  class='fixed inset-0 z-100 flex items-center justify-center'
+  style='background: var(--color-surface-container-lowest);'>
+  <h1
+    class='font-display font-bold text-on-surface select-none'
+    style='font-size: clamp(3rem, 10vw, 7rem); letter-spacing: -0.04em;'>
+    Daniel Gualdron
+  </h1>
+</div>
+
+<script>
+  const preloader = document.getElementById('preloader');
+  const pageWrap = document.getElementById('page-wrap');
+  const siteHeader = document.querySelector('body > header');
+
+  if (preloader) {
+    const preloaderEl = preloader;
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    const preloaderHeadingEl = preloaderEl.querySelector('h1');
+
+    if (preloaderHeadingEl) {
+      if (prefersReducedMotion) {
+        preloaderHeadingEl.animate([{ opacity: 0 }, { opacity: 1 }], {
+          duration: 800,
+          easing: 'ease-out',
+          fill: 'forwards',
+        });
+      } else {
+        preloaderHeadingEl.animate(
+          [
+            { opacity: 0, transform: 'translateY(80px) scale(0.85)' },
+            { opacity: 1, transform: 'translateY(0px)  scale(1)' },
+          ],
+          { duration: 4000, easing: 'ease-in-out', fill: 'forwards' },
+        );
+      }
+    }
+
+    const preloaderHoldDelayMs = prefersReducedMotion ? 1000 : 5500;
+
+    setTimeout(() => {
+      preloaderEl.classList.add('done');
+
+      setTimeout(
+        () => {
+          if (pageWrap) pageWrap.classList.add('revealed');
+          if (siteHeader) siteHeader.classList.add('revealed');
+        },
+        prefersReducedMotion ? 0 : 900,
+      );
+
+      preloaderEl.addEventListener(
+        'animationend',
+        (e) => {
+          if (e.animationName !== 'fadeOut') return;
+          preloaderEl.remove();
+        },
+        { once: true },
+      );
+    }, preloaderHoldDelayMs);
+  }
+</script>
