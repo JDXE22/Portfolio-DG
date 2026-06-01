@@ -5,10 +5,11 @@ import type { Logo } from '../data/portfolio';
 
 interface Props {
   isReelReady: boolean;
+  reelYoutubeId: string;
   logos: Logo[];
 }
 
-const { isReelReady, logos } = Astro.props;
+const { isReelReady, reelYoutubeId, logos } = Astro.props;
 ---
 
 <section
@@ -49,7 +50,12 @@ const { isReelReady, logos } = Astro.props;
     <div class='flex items-center gap-4 flex-wrap'>
       {
         isReelReady ? (
-          <Button variant='primary' href='#reel' label='Watch the reel'>
+          <Button
+            variant='primary'
+            href={`https://www.youtube.com/watch?v=${reelYoutubeId}`}
+            target='_blank'
+            rel='noopener noreferrer'
+            label='Watch the reel'>
             Watch the Reel
           </Button>
         ) : (

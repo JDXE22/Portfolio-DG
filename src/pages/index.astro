@@ -8,7 +8,7 @@ import CinematographySection from '../components/CinematographySection.astro';
 import VideoModal from '../components/VideoModal.astro';
 import ContactSection from '../components/ContactSection.astro';
 import Footer from '../components/Footer.astro';
-import { NAV_LINKS, LOGOS, CATEGORIES, VIDEOS, INITIAL_VISIBLE } from '../data/portfolio';
+import { NAV_LINKS, LOGOS, CATEGORIES, VIDEOS, INITIAL_VISIBLE, REEL_YOUTUBE_ID } from '../data/portfolio';
 
 const isReelReady = false;
 ---
@@ -19,7 +19,7 @@ const isReelReady = false;
 
   <div id='page-wrap'>
     <main id='main-content'>
-      <HeroSection isReelReady={isReelReady} logos={LOGOS} />
+      <HeroSection isReelReady={isReelReady} reelYoutubeId={REEL_YOUTUBE_ID} logos={LOGOS} />
       <AboutSection />
       <CinematographySection
         categories={CATEGORIES}
