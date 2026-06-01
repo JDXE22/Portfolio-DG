@@ -1,0 +1,71 @@
+---
+// no props — static content
+---
+
+<section
+  id='about'
+  aria-label='About'
+  class='px-6 md:px-12 py-24 md:py-32'
+  style='background: var(--color-surface-container-low);'>
+  <div
+    class='max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center'>
+    <!-- Bio -->
+    <div>
+      <p
+        class='text-xs uppercase tracking-widest mb-6'
+        style='color: var(--color-primary); letter-spacing: 0.15em;'>
+        About
+      </p>
+      <!-- Left accent bar + heading -->
+      <div class='flex gap-4 items-stretch mb-6'>
+        <span class='about-accent-bar' aria-hidden='true'></span>
+        <h2
+          class='font-display font-bold text-on-surface leading-tight'
+          style='font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em;'>
+          Every frame is<br />a decision.
+        </h2>
+      </div>
+      <p
+        class='text-base leading-relaxed mb-4'
+        style='color: var(--color-on-surface-variant);'>
+        I believe stories aren't just seen, they're felt. As a filmmaker,
+        editor, and creative originally from Colombia, based in Atlanta, I
+        bridge the gap between imagination and high end production. For
+        over seven years, I've specialized in crafting commercial,
+        corporate, and branded content that blends cinematic atmosphere
+        with authentic storytelling.
+      </p>
+      <p
+        class='text-base leading-relaxed mb-8'
+        style='color: var(--color-on-surface-variant);'>
+        From concept development to the final edit, I immerse myself in
+        every step of the process, cinematography, direction, and post
+        production, turning bold ideas into striking visuals that
+        resonate, inspire, and leave a lasting impact.
+      </p>
+    </div>
+
+    <!-- Portrait -->
+    <div class='relative'>
+      <div
+        class='relative rounded-lg overflow-hidden'
+        style='background: var(--color-surface-container-high);'>
+        <!-- Inner glow overlay -->
+        <div
+          class='absolute inset-0 z-10 rounded-lg pointer-events-none'
+          style='box-shadow: inset 0 0 40px color-mix(in srgb, var(--color-surface-container-lowest) 30%, transparent);'
+          aria-hidden='true'>
+        </div>
+        <img
+          src='https://res.cloudinary.com/dqyaxyvxz/image/upload/f_auto,q_auto,w_900/v1779308186/ssf_Green_Rose-5_vcyvzk.heic'
+          alt='Daniel Gualdron, Director of Photography'
+          width='900'
+          height='1125'
+          loading='lazy'
+          class='portrait-img w-full object-cover block'
+          style='aspect-ratio: 4/5;'
+        />
+      </div>
+    </div>
+  </div>
+</section>
