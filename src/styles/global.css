@@ -248,6 +248,14 @@ nav a[data-active='true']::after {
   transform: scale(1);
 }
 
+.video-card img[data-thumbnail] {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.video-card:hover img[data-thumbnail] {
+  transform: scale(1.04);
+}
+
 /* ── Filter pill ────────────────────────────────── */
 .filter-pill {
   background: color-mix(in srgb, var(--color-on-surface) 6%, transparent);
@@ -290,4 +298,25 @@ nav a[data-active='true']::after {
   );
   pointer-events: none;
   z-index: 0;
+}
+
+/* ── Scroll Reveal Animations ───────────────────── */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.scroll-reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

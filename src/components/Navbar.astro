@@ -150,6 +150,12 @@ const { links } = Astro.props;
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setActive(entry.target.id);
+            // Silently update the URL hash without pushing to history
+            if (entry.target.id === 'hero') {
+              history.replaceState(null, '', window.location.pathname);
+            } else {
+              history.replaceState(null, '', '#' + entry.target.id);
+            }
           }
         });
       },
