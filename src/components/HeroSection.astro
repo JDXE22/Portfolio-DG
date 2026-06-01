@@ -42,11 +42,11 @@ const { isReelReady, reelYoutubeId, logos } = Astro.props;
       style='color: var(--color-primary); letter-spacing: 0.15em;'>
       Director of Photography
     </p>
-    <h2
+    <h1
       class='font-display font-bold text-on-surface mb-8 leading-none'
-      style='font-size: clamp(2.5rem, 7vw, 5.5rem); letter-spacing: -0.04em;'>
+      style='font-size: clamp(2.5rem, 7vw, 5.5rem); letter-spacing: -0.04em; text-shadow: 0 4px 40px color-mix(in srgb, var(--color-primary) 20%, transparent);'>
       Framing stories<br />worth watching.
-    </h2>
+    </h1>
     <div class='flex items-center gap-4 flex-wrap'>
       {
         isReelReady ? (
@@ -59,9 +59,9 @@ const { isReelReady, reelYoutubeId, logos } = Astro.props;
             Watch the Reel
           </Button>
         ) : (
-          <Button variant='primary' disabled label='Reel coming soon'>
+          <span class="text-sm font-semibold uppercase tracking-widest text-on-surface-variant px-6 py-3 border border-outline-variant/30 rounded-sm">
             Reel Coming Soon
-          </Button>
+          </span>
         )
       }
       <Button variant='secondary' href='#cinematography'>
@@ -87,7 +87,7 @@ const { isReelReady, reelYoutubeId, logos } = Astro.props;
   <!-- Trusted By -->
   <div
     class='relative mt-20'
-    style='z-index: 2; border-top: 1px solid color-mix(in srgb, var(--color-outline-variant) 15%, transparent); padding-top: 2rem;'>
+    style='z-index: 2; padding-top: 2rem;'>
     <p
       class='text-xs uppercase tracking-widest mb-6 px-0'
       style='color: var(--color-outline-variant); letter-spacing: 0.15em;'>

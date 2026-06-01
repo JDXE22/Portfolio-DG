@@ -8,7 +8,7 @@ interface Props {
 
 const {
   title = 'Daniel Gualdron — Director of Photography',
-  description = 'Portfolio of a cinematographer and director of photography.',
+  description = 'Daniel Gualdron — Director of Photography based in Atlanta. Commercial, narrative, and branded content cinematography. Seven years of crafting cinematic stories.',
 } = Astro.props;
 ---
 
@@ -23,10 +23,22 @@ const {
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Daniel Gualdron" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Manrope:wght@300;400;600;700;800&display=swap"
+      media="print" onload="this.media='all'"
       rel="stylesheet"
     />
 

@@ -43,14 +43,9 @@ const { categories, videos, initialVisible } = Astro.props;
           categories.map((cat, i) => (
             <button
               type='button'
-              class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
+              class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-sm transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
               data-filter={cat}
-              aria-pressed={i === 0 ? 'true' : 'false'}
-              style={
-                i !== 0
-                  ? `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);`
-                  : ''
-              }>
+              aria-pressed={i === 0 ? 'true' : 'false'}>
               {cat}
             </button>
           ))
@@ -106,8 +101,7 @@ const { categories, videos, initialVisible } = Astro.props;
     (videoGrid as HTMLElement | null)?.dataset.initialVisible ?? '4',
     10,
   );
-  const INACTIVE_PILL_STYLE =
-    'border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);';
+
 
   let isGridExpanded = false;
 
@@ -163,9 +157,7 @@ const { categories, videos, initialVisible } = Astro.props;
         const isActive = pill === clickedPill;
         pill.classList.toggle('active', isActive);
         pill.setAttribute('aria-pressed', String(isActive));
-        if (pill instanceof HTMLElement) {
-          pill.style.cssText = isActive ? '' : INACTIVE_PILL_STYLE;
-        }
+
       });
 
       videoGridEl.querySelectorAll('.video-card').forEach((card) => {

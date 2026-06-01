@@ -12,7 +12,7 @@
   <div
     id='modal-backdrop'
     class='absolute inset-0'
-    style='background: rgba(4,4,4,0.9); opacity: 0;'>
+    style='background: color-mix(in srgb, var(--color-surface-container-lowest) 94%, transparent); opacity: 0;'>
   </div>
 
   <!-- Panel (FLIP-animates from card position) -->
@@ -25,7 +25,7 @@
       id='modal-close'
       aria-label='Close video'
       class='absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-      style='background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); color: #fff; border: 1px solid rgba(255,255,255,0.12);'>
+      style='background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); color: var(--color-on-surface); border: 1px solid rgba(255,255,255,0.12);'>
       <svg
         width='14'
         height='14'
@@ -44,7 +44,7 @@
     <div
       id='modal-player-container'
       class='w-full block'
-      style='aspect-ratio: 16/9; background: #000;'>
+      style='aspect-ratio: 16/9; background: var(--color-surface-container-lowest);'>
     </div>
 
     <!-- Info bar -->
