@@ -1,0 +1,273 @@
+---
+// no props — modal is wired via custom events (video:open)
+---
+
+<div
+  id='video-modal'
+  role='dialog'
+  aria-modal='true'
+  aria-label='Video player'
+  class='fixed inset-0 z-80 hidden'>
+  <!-- Backdrop -->
+  <div
+    id='modal-backdrop'
+    class='absolute inset-0'
+    style='background: rgba(4,4,4,0.9); opacity: 0;'>
+  </div>
+
+  <!-- Panel (FLIP-animates from card position) -->
+  <div
+    id='modal-inner'
+    class='absolute rounded-lg overflow-hidden'
+    style='top: 50%; left: 50%; width: min(90vw, 1100px); transform: translate(-50%, -50%); transform-origin: center center; opacity: 0;'>
+    <!-- Close button -->
+    <button
+      id='modal-close'
+      aria-label='Close video'
+      class='absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+      style='background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); color: #fff; border: 1px solid rgba(255,255,255,0.12);'>
+      <svg
+        width='14'
+        height='14'
+        viewBox='0 0 14 14'
+        fill='none'
+        aria-hidden='true'>
+        <path
+          d='M1 1l12 12M13 1L1 13'
+          stroke='currentColor'
+          stroke-width='1.75'
+          stroke-linecap='round'></path>
+      </svg>
+    </button>
+
+    <!-- YouTube iframe container (injected on open, destroyed on close) -->
+    <div
+      id='modal-player-container'
+      class='w-full block'
+      style='aspect-ratio: 16/9; background: #000;'>
+    </div>
+
+    <!-- Info bar -->
+    <div
+      class='px-5 py-4 flex items-baseline justify-between gap-4'
+      style='background: var(--color-surface-container-lowest);'>
+      <div>
+        <p
+          id='modal-category'
+          class='text-xs uppercase tracking-widest mb-0.5'
+          style='color: var(--color-primary); letter-spacing: 0.15em;'>
+        </p>
+        <h3
+          id='modal-title'
+          class='font-display text-base font-semibold text-on-surface leading-snug'>
+        </h3>
+      </div>
+      <p
+        id='modal-meta'
+        class='text-xs shrink-0'
+        style='color: var(--color-on-surface-variant);'>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  #page-wrap {
+    transition: filter 0.35s ease;
+  }
+  #page-wrap.modal-open {
+    filter: blur(5px) brightness(0.35);
+    pointer-events: none;
+    user-select: none;
+  }
+</style>
+
+<script>
+  const FOCUSABLE_SELECTOR =
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+  const modal = document.getElementById('video-modal');
+  const backdrop = document.getElementById('modal-backdrop');
+  const modalInner = document.getElementById('modal-inner');
+  const playerContainer = document.getElementById('modal-player-container');
+  const modalClose = document.getElementById('modal-close');
+  const modalTitleEl = document.getElementById('modal-title');
+  const modalMetaEl = document.getElementById('modal-meta');
+  const modalCatEl = document.getElementById('modal-category');
+  const pageWrap = document.getElementById('page-wrap');
+
+  if (modal && backdrop && modalInner && playerContainer && modalClose) {
+    const modalEl = modal;
+    const backdropEl = backdrop;
+    const modalPanelEl = modalInner;
+    const closeButtonEl = modalClose;
+    const containerEl = playerContainer;
+
+    let isModalOpen = false;
+    let previouslyFocusedElement: Element | null = null;
+
+    function buildYouTubeEmbedUrl(videoId: string): string {
+      const params = new URLSearchParams({
+        autoplay: '1',
+        rel: '0',
+        modestbranding: '1',
+        playsinline: '1',
+      });
+      return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+    }
+
+    function injectYouTubeIframe(videoId: string, videoTitle: string): void {
+      const iframe = document.createElement('iframe');
+      iframe.src = buildYouTubeEmbedUrl(videoId);
+      iframe.title = videoTitle;
+      iframe.width = '100%';
+      iframe.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.display = 'block';
+      iframe.setAttribute(
+        'allow',
+        'autoplay; encrypted-media; picture-in-picture',
+      );
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('loading', 'lazy');
+      containerEl.appendChild(iframe);
+    }
+
+    function destroyYouTubeIframe(): void {
+      containerEl.innerHTML = '';
+    }
+
+    function openModal(detail: {
+      youtubeId: string;
+      title: string;
+      meta: string;
+      category: string;
+      rect: DOMRect;
+    }) {
+      const { youtubeId, title, meta, category, rect } = detail;
+      if (!youtubeId || isModalOpen) return;
+      isModalOpen = true;
+      previouslyFocusedElement = document.activeElement;
+
+      if (modalTitleEl) modalTitleEl.textContent = title;
+      if (modalMetaEl) modalMetaEl.textContent = meta;
+      if (modalCatEl) modalCatEl.textContent = category;
+
+      injectYouTubeIframe(youtubeId, title);
+
+      modalEl.classList.remove('hidden');
+      modalPanelEl.style.transition = 'none';
+      modalPanelEl.style.transform = 'translate(-50%, -50%)';
+      modalPanelEl.style.opacity = '0';
+      backdropEl.style.transition = 'none';
+      backdropEl.style.opacity = '0';
+      modalEl.style.pointerEvents = 'none';
+
+      void modalPanelEl.offsetHeight;
+      const panelRect = modalPanelEl.getBoundingClientRect();
+
+      const scaleX = rect.width / panelRect.width;
+      const scaleY = rect.height / panelRect.height;
+      const offsetX = rect.left + rect.width / 2 - window.innerWidth / 2;
+      const offsetY = rect.top + rect.height / 2 - window.innerHeight / 2;
+
+      modalPanelEl.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scaleX}, ${scaleY})`;
+      modalPanelEl.style.opacity = '1';
+
+      document.body.style.overflow = 'hidden';
+      pageWrap?.classList.add('modal-open');
+      pageWrap?.setAttribute('inert', '');
+
+      void modalPanelEl.offsetHeight;
+
+      requestAnimationFrame(() => {
+        modalPanelEl.style.transition =
+          'transform 0.46s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease';
+        modalPanelEl.style.transform = 'translate(-50%, -50%)';
+        backdropEl.style.transition = 'opacity 0.35s ease';
+        backdropEl.style.opacity = '1';
+        modalEl.style.pointerEvents = 'auto';
+      });
+
+      setTimeout(() => closeButtonEl.focus(), 480);
+    }
+
+    function closeModal() {
+      if (!isModalOpen) return;
+      isModalOpen = false;
+      modalEl.style.pointerEvents = 'none';
+
+      modalPanelEl.style.transition =
+        'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease';
+      modalPanelEl.style.transform = 'translate(-50%, -50%) scale(0.94)';
+      modalPanelEl.style.opacity = '0';
+      backdropEl.style.transition = 'opacity 0.28s ease';
+      backdropEl.style.opacity = '0';
+
+      setTimeout(() => {
+        modalEl.classList.add('hidden');
+        destroyYouTubeIframe();
+        document.body.style.overflow = '';
+        pageWrap?.classList.remove('modal-open');
+        pageWrap?.removeAttribute('inert');
+        if (previouslyFocusedElement instanceof HTMLElement)
+          previouslyFocusedElement.focus();
+      }, 320);
+    }
+
+    function trapFocus(e: KeyboardEvent) {
+      const focusableElements = Array.from(
+        modalEl.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter((el) => !el.closest('[hidden]') && el.offsetParent !== null);
+
+      if (focusableElements.length === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      const firstFocusable = focusableElements[0]!;
+      const lastFocusable = focusableElements[focusableElements.length - 1]!;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          e.preventDefault();
+          lastFocusable.focus();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          e.preventDefault();
+          firstFocusable.focus();
+        }
+      }
+    }
+
+    document.addEventListener('video:open', (e) => {
+      openModal(
+        (
+          e as CustomEvent<{
+            youtubeId: string;
+            title: string;
+            meta: string;
+            category: string;
+            rect: DOMRect;
+          }>
+        ).detail,
+      );
+    });
+
+    closeButtonEl.addEventListener('click', closeModal);
+
+    modalEl.addEventListener('click', (e) => {
+      if (!modalPanelEl.contains(e.target as Node | null)) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!isModalOpen) return;
+      if (e.key === 'Escape') {
+        closeModal();
+        return;
+      }
+      if (e.key === 'Tab') trapFocus(e);
+    });
+  }
+</script>
