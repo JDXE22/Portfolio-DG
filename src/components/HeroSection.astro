@@ -1,0 +1,92 @@
+---
+import Button from './Button.astro';
+import TrustedBy from './TrustedBy.astro';
+import type { Logo } from '../data/portfolio';
+
+interface Props {
+  isReelReady: boolean;
+  logos: Logo[];
+}
+
+const { isReelReady, logos } = Astro.props;
+---
+
+<section
+  id='hero'
+  aria-label='Hero'
+  class='relative min-h-screen flex flex-col justify-end pb-20 px-6 md:px-12 pt-32'
+  style='background: var(--color-surface);'>
+  <!-- Background portrait -->
+  <img
+    src='https://res.cloudinary.com/dqyaxyvxz/image/upload/f_auto,q_auto,w_1920/v1779308364/20250720-DaniShinobi-9_skz4wd.jpg'
+    alt=''
+    aria-hidden='true'
+    width='1920'
+    height='1080'
+    loading='eager'
+    fetchpriority='high'
+    class='absolute inset-0 w-full h-full object-cover object-center'
+    style='z-index: 0;'
+  />
+  <!-- Dark gradient overlay — keeps text legible -->
+  <div
+    class='absolute inset-0 pointer-events-none'
+    style='z-index: 1; background: linear-gradient(to top, var(--color-surface) 20%, color-mix(in srgb, var(--color-surface) 50%, transparent) 55%, color-mix(in srgb, var(--color-surface) 20%, transparent) 100%);'
+    aria-hidden='true'>
+  </div>
+
+  <div class='relative max-w-4xl' style='z-index: 2;'>
+    <p
+      class='text-xs uppercase tracking-widest mb-6'
+      style='color: var(--color-primary); letter-spacing: 0.15em;'>
+      Director of Photography
+    </p>
+    <h2
+      class='font-display font-bold text-on-surface mb-8 leading-none'
+      style='font-size: clamp(2.5rem, 7vw, 5.5rem); letter-spacing: -0.04em;'>
+      Framing stories<br />worth watching.
+    </h2>
+    <div class='flex items-center gap-4 flex-wrap'>
+      {
+        isReelReady ? (
+          <Button variant='primary' href='#reel' label='Watch the reel'>
+            Watch the Reel
+          </Button>
+        ) : (
+          <Button variant='primary' disabled label='Reel coming soon'>
+            Reel Coming Soon
+          </Button>
+        )
+      }
+      <Button variant='secondary' href='#cinematography'>
+        View Work
+      </Button>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class='flex items-center gap-3 mt-6' aria-hidden='true'>
+      <div class='w-8 h-px' style='background: var(--color-primary);'></div>
+      <span
+        class='text-xs uppercase tracking-widest'
+        style='color: var(--color-outline-variant); letter-spacing: 0.15em;'>
+        Scroll to explore
+      </span>
+      <span
+        class='text-on-surface-variant animate-bounce'
+        style='animation-duration: 2s;'>↓</span
+      >
+    </div>
+  </div>
+
+  <!-- Trusted By -->
+  <div
+    class='relative mt-20'
+    style='z-index: 2; border-top: 1px solid color-mix(in srgb, var(--color-outline-variant) 15%, transparent); padding-top: 2rem;'>
+    <p
+      class='text-xs uppercase tracking-widest mb-6 px-0'
+      style='color: var(--color-outline-variant); letter-spacing: 0.15em;'>
+      Trusted by
+    </p>
+    <TrustedBy logos={logos} />
+  </div>
+</section>
