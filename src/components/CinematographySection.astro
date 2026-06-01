@@ -1,0 +1,213 @@
+---
+import Button from './Button.astro';
+import VideoCard from './VideoCard.astro';
+import type { Video } from '../data/portfolio';
+
+interface Props {
+  categories: string[];
+  videos: Video[];
+  initialVisible: number;
+}
+
+const { categories, videos, initialVisible } = Astro.props;
+---
+
+<section
+  id='cinematography'
+  aria-label='Cinematography work'
+  class='px-6 md:px-12 py-24 md:py-32'
+  style='background: var(--color-surface);'>
+  <div class='max-w-6xl mx-auto'>
+    <div
+      class='flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12'>
+      <div>
+        <p
+          class='text-xs uppercase tracking-widest mb-3'
+          style='color: var(--color-primary); letter-spacing: 0.15em;'>
+          Work
+        </p>
+        <h2
+          class='font-display font-bold text-on-surface leading-tight'
+          style='font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.03em;'>
+          Cinematography
+        </h2>
+      </div>
+
+      <!-- Category filters -->
+      <div
+        role='group'
+        aria-label='Filter by category'
+        class='flex flex-wrap gap-2'
+        id='filter-group'>
+        {
+          categories.map((cat, i) => (
+            <button
+              type='button'
+              class={`filter-pill text-xs uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${i === 0 ? 'active' : ''}`}
+              data-filter={cat}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              style={
+                i !== 0
+                  ? `border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);`
+                  : ''
+              }>
+              {cat}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- Video grid — data-initial-visible read by script at runtime -->
+    <div
+      id='video-grid'
+      class='grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6'
+      role='list'
+      aria-label='Video portfolio'
+      data-initial-visible={initialVisible}>
+      {
+        videos.map((v, i) => (
+          <div role='listitem'>
+            <VideoCard
+              id={v.id}
+              title={v.title}
+              category={v.category}
+              youtubeId={v.youtubeId}
+              meta={v.meta}
+              hidden={i >= initialVisible}
+            />
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- View All -->
+    {
+      videos.length > initialVisible && (
+        <div class='mt-10 text-center'>
+          <Button
+            variant='secondary'
+            id='view-all-btn'
+            label='Show all cinematography work'>
+            View All Work
+          </Button>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  const filterGroup = document.getElementById('filter-group');
+  const videoGrid = document.getElementById('video-grid');
+  const viewAllBtn = document.getElementById('view-all-btn');
+
+  const INITIAL_VISIBLE_COUNT = parseInt(
+    (videoGrid as HTMLElement | null)?.dataset.initialVisible ?? '4',
+    10,
+  );
+  const INACTIVE_PILL_STYLE =
+    'border: 1px solid color-mix(in srgb, var(--color-outline-variant) 20%, transparent); color: var(--color-on-surface-variant);';
+
+  let isGridExpanded = false;
+
+  function cardMatchesFilter(card: HTMLElement, filter: string): boolean {
+    return filter === 'All' || card.dataset.category === filter;
+  }
+
+  function getActiveFilter(): string {
+    const activePill = filterGroup?.querySelector('.filter-pill.active');
+    return (
+      (activePill instanceof HTMLElement ? activePill.dataset.filter : null) ??
+      'All'
+    );
+  }
+
+  function collapseGrid(filter: string) {
+    if (!videoGrid) return;
+    let visibleCount = 0;
+    videoGrid.querySelectorAll('.video-card').forEach((card) => {
+      if (!(card instanceof HTMLElement)) return;
+      if (cardMatchesFilter(card, filter)) {
+        visibleCount++;
+        card.dataset.hidden =
+          visibleCount > INITIAL_VISIBLE_COUNT ? 'true' : 'false';
+      }
+    });
+  }
+
+  function syncViewAllButton(filter: string) {
+    if (!viewAllBtn || !videoGrid) return;
+    let matchCount = 0;
+    videoGrid.querySelectorAll('.video-card').forEach((card) => {
+      if (card instanceof HTMLElement && cardMatchesFilter(card, filter))
+        matchCount++;
+    });
+    viewAllBtn.hidden = matchCount <= INITIAL_VISIBLE_COUNT;
+    viewAllBtn.textContent = 'View All Work';
+    viewAllBtn.setAttribute('aria-label', 'Show all cinematography work');
+  }
+
+  if (filterGroup && videoGrid) {
+    const filterGroupEl = filterGroup;
+    const videoGridEl = videoGrid;
+
+    filterGroupEl.addEventListener('click', (e) => {
+      if (!(e.target instanceof HTMLElement)) return;
+      const clickedPill = e.target.closest('.filter-pill');
+      if (!(clickedPill instanceof HTMLElement)) return;
+
+      const selectedFilter = clickedPill.dataset.filter ?? 'All';
+
+      filterGroupEl.querySelectorAll('.filter-pill').forEach((pill) => {
+        const isActive = pill === clickedPill;
+        pill.classList.toggle('active', isActive);
+        pill.setAttribute('aria-pressed', String(isActive));
+        if (pill instanceof HTMLElement) {
+          pill.style.cssText = isActive ? '' : INACTIVE_PILL_STYLE;
+        }
+      });
+
+      videoGridEl.querySelectorAll('.video-card').forEach((card) => {
+        if (!(card instanceof HTMLElement)) return;
+        card.dataset.hidden = cardMatchesFilter(card, selectedFilter)
+          ? 'false'
+          : 'true';
+      });
+
+      isGridExpanded = false;
+      collapseGrid(selectedFilter);
+      syncViewAllButton(selectedFilter);
+    });
+  }
+
+  if (viewAllBtn && videoGrid) {
+    const viewAllButtonEl = viewAllBtn;
+    const videoGridEl = videoGrid;
+
+    viewAllButtonEl.addEventListener('click', () => {
+      const activeFilter = getActiveFilter();
+      if (!isGridExpanded) {
+        videoGridEl.querySelectorAll('.video-card').forEach((card) => {
+          if (
+            card instanceof HTMLElement &&
+            cardMatchesFilter(card, activeFilter)
+          ) {
+            card.dataset.hidden = 'false';
+          }
+        });
+        viewAllButtonEl.textContent = 'Show Less';
+        viewAllButtonEl.setAttribute('aria-label', 'Show fewer videos');
+        isGridExpanded = true;
+      } else {
+        collapseGrid(activeFilter);
+        viewAllButtonEl.textContent = 'View All Work';
+        viewAllButtonEl.setAttribute(
+          'aria-label',
+          'Show all cinematography work',
+        );
+        isGridExpanded = false;
+      }
+    });
+  }
+</script>
