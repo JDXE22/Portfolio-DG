@@ -82,10 +82,13 @@ const resolvedPoster =
       style='color: var(--color-primary); letter-spacing: 0.15em;'>
       {category}
     </p>
-    <h3 class='font-display text-base font-semibold text-on-surface leading-snug'>
+    <h3
+      class='font-display text-base font-semibold text-on-surface leading-snug'>
       {title}
     </h3>
-    <p class='text-xs mt-1 uppercase tracking-widest' style='color: var(--color-on-surface-variant); letter-spacing: 0.15em;'>
+    <p
+      class='text-xs mt-1 uppercase tracking-widest'
+      style='color: var(--color-on-surface-variant); letter-spacing: 0.15em;'>
       {meta}
     </p>
   </div>
@@ -95,7 +98,8 @@ const resolvedPoster =
   document.querySelectorAll('.video-card').forEach((card) => {
     if (!(card instanceof HTMLElement)) return;
 
-    const thumbnailEl = card.querySelector<HTMLImageElement>('[data-thumbnail]');
+    const thumbnailEl =
+      card.querySelector<HTMLImageElement>('[data-thumbnail]');
     const skeleton = card.querySelector<HTMLElement>('[data-skeleton]');
 
     const hideSkeleton = () => {

@@ -15,6 +15,7 @@ export interface Video {
   title: string;
   category: string;
   youtubeId: string;
+  poster?: string;
   meta: string;
 }
 
@@ -51,8 +52,6 @@ export const INITIAL_VISIBLE = 4;
 // TODO: Replace with real reel YouTube ID when ready, then set isReelReady = true in index.astro
 export const REEL_YOUTUBE_ID = 'PLACEHOLDER_REEL';
 
-// TODO: Replace each youtubeId with the real YouTube video ID after upload
-// Format: 11-character ID from youtube.com/watch?v=XXXXXXXXXXX
 export const VIDEOS: Video[] = [
   {
     id: 'v1',
@@ -80,6 +79,7 @@ export const VIDEOS: Video[] = [
     title: 'Resurgens Orthopedics: Loren',
     category: 'Commercial',
     youtubeId: 'EQkLtgjF3ig',
+    poster: '/posters/Resurgens-Orthopedics-A.jpg',
     meta: '1080p • SPHERICAL • 2024',
   },
   {
