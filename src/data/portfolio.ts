@@ -128,6 +128,7 @@ export const VIDEOS: Video[] = [
     title: 'SPM X NICK',
     category: 'Social',
     youtubeId: '2qH0N1r483o',
+    poster: '/posters/SPM.jpeg',
     meta: '1080p • 2026',
   },
   {
