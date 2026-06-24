@@ -74,6 +74,7 @@ export const VIDEOS: Video[] = [
     title: 'Resurgens Orthopedics: Adonis',
     category: 'Commercial',
     youtubeId: 'HOOM-BSNoFE',
+    poster: '/posters/adonis.jpeg',
     meta: '1080p • ANAMORPHIC • 2023',
   },
   {
