@@ -73,7 +73,7 @@ export const VIDEOS: Video[] = [
     id: 'v3',
     title: 'Resurgens Orthopedics: Adonis',
     category: 'Commercial',
-    youtubeId: 'PLACEHOLDER_V3',
+    youtubeId: 'HOOM-BSNoFE',
     meta: '1080p • ANAMORPHIC • 2023',
   },
   {
@@ -137,6 +137,14 @@ export const VIDEOS: Video[] = [
     category: 'Social',
     youtubeId: 'Z0ZtLWKjBUw',
     poster: '/posters/SWC.jpg',
+    meta: '1080p • 2026',
+  },
+  {
+    id: 'v12',
+    title: 'Hbg House Of Cross',
+    category: 'Editing',
+    youtubeId: 'C213-nvEXXA',
+    poster: '/posters/hbg_house_of_cross.jpeg',
     meta: '1080p • 2026',
   },
 ];
