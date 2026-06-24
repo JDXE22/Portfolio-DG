@@ -58,6 +58,7 @@ export const VIDEOS: Video[] = [
     title: 'Honey Baked Ham',
     category: 'Commercial',
     youtubeId: 'uojwW0_77Eg',
+    poster: '/posters/HBJ.jpg',
     meta: '1080p • 2026',
   },
   {
@@ -65,6 +66,7 @@ export const VIDEOS: Video[] = [
     title: 'SSP America',
     category: 'Commercial',
     youtubeId: 'su4EfLhguhY',
+    poster: '/posters/SSP_America.jpg',
     meta: '1080p • 2024',
   },
   {
@@ -87,6 +89,7 @@ export const VIDEOS: Video[] = [
     title: 'Warrior Alliance',
     category: 'Narrative',
     youtubeId: 'LrkZ9jthmZg',
+    poster: '/posters/Warrior-alliance.jpg',
     meta: '1080p  • 2026',
   },
   {
@@ -101,6 +104,7 @@ export const VIDEOS: Video[] = [
     title: 'Ziegler Caterpillar',
     category: 'Editing',
     youtubeId: 'XHqGdNwJdU0',
+    poster: '/posters/caterpillar.jpg',
     meta: '1080p • 2026',
   },
   {
@@ -108,6 +112,7 @@ export const VIDEOS: Video[] = [
     title: 'Our Georgia Coast',
     category: 'Narrative',
     youtubeId: 'uRPAglZacHs',
+    poster: '/posters/Georgia-Coast.jpg',
     meta: '1080p • 2026',
   },
   {
