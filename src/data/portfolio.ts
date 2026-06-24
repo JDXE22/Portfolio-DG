@@ -58,7 +58,7 @@ export const VIDEOS: Video[] = [
     title: 'Honey Baked Ham',
     category: 'Commercial',
     youtubeId: 'uojwW0_77Eg',
-    poster: '/posters/HBJ.jpg',
+    poster: '/posters/HBJ.jpeg',
     meta: '1080p • 2026',
   },
   {
@@ -66,7 +66,7 @@ export const VIDEOS: Video[] = [
     title: 'SSP America',
     category: 'Commercial',
     youtubeId: 'su4EfLhguhY',
-    poster: '/posters/SSP_America.jpg',
+    poster: '/posters/SSP_America.jpeg',
     meta: '1080p • 2024',
   },
   {
@@ -89,7 +89,7 @@ export const VIDEOS: Video[] = [
     title: 'Warrior Alliance',
     category: 'Narrative',
     youtubeId: 'LrkZ9jthmZg',
-    poster: '/posters/Warrior-alliance.jpg',
+    poster: '/posters/Warrior_alliance.jpeg',
     meta: '1080p  • 2026',
   },
   {
@@ -104,7 +104,7 @@ export const VIDEOS: Video[] = [
     title: 'Ziegler Caterpillar',
     category: 'Editing',
     youtubeId: 'XHqGdNwJdU0',
-    poster: '/posters/caterpillar.jpg',
+    poster: '/posters/caterpillar.jpeg',
     meta: '1080p • 2026',
   },
   {
@@ -112,14 +112,15 @@ export const VIDEOS: Video[] = [
     title: 'Our Georgia Coast',
     category: 'Narrative',
     youtubeId: 'uRPAglZacHs',
-    poster: '/posters/Georgia-Coast.jpg',
+    poster: '/posters/Georgia_coast.jpeg',
     meta: '1080p • 2026',
   },
   {
     id: 'v9',
-    title: 'Our Georgia Coast - Dr shamblin',
+    title: 'Our Georgia Coast - Dr Shamblin',
     category: 'Narrative',
     youtubeId: 'xUCzXhgFilQ',
+    poster: '/posters/Georgia_coast_dr_s.jpeg',
     meta: '1080p • ANAMORPHIC • 2026',
   },
   {
