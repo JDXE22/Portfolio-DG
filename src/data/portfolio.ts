@@ -124,7 +124,6 @@ export const VIDEOS: Video[] = [
     youtubeId: '2qH0N1r483o',
     meta: '1080p • 2026',
   },
-
   {
     id: 'v11',
     title: 'SWC - Soul Work',
