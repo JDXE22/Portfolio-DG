@@ -94,13 +94,6 @@ export const VIDEOS: Video[] = [
     meta: '1080p  • 2026',
   },
   {
-    id: 'v6',
-    title: 'Resurgens Orthopedics: Spine Center',
-    category: 'Editing',
-    youtubeId: 'PLACEHOLDER_V6',
-    meta: '1080p • SPHERICAL • 2024',
-  },
-  {
     id: 'v7',
     title: 'Ziegler Caterpillar',
     category: 'Editing',
