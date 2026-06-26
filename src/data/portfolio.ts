@@ -148,4 +148,21 @@ export const VIDEOS: Video[] = [
     poster: '/posters/hbg_house_of_cross.jpeg',
     meta: '1080p • 2026',
   },
+  {
+    id: 'v13',
+    title: 'SWC Cherry 2',
+    category: 'Social',
+    youtubeId: 'GDsdodmp6Fs',
+    poster: '/posters/SWC-Cherry.jpeg',
+    meta: '1080p • 2024',
+  },
+
+  {
+    id: 'v14',
+    title: 'Soul work',
+    category: 'Editing',
+    youtubeId: 'rX6-EWSY1ro',
+    poster: '/posters/Soul-work.jpeg',
+    meta: '1080p • 2024',
+  },
 ];
