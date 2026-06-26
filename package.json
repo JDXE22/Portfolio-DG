@@ -6,10 +6,10 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev --host",
+    "dev": "astro dev",
+    "start": "astro preview --host",
     "build": "astro build",
     "preview": "astro preview",
-    "start": "astro preview --host",
     "astro": "astro"
   },
   "dependencies": {
