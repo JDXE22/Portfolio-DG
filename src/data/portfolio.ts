@@ -80,7 +80,7 @@ export const VIDEOS: Video[] = [
   {
     id: 'v15',
     title: 'GA Heart 2026 Campaign',
-    category: 'Narrrative',
+    category: 'Narrative',
     youtubeId: 'PRTJz6WCaQY',
     poster: '/posters/GA_HEART_2026_Campaign.jpeg',
     meta: '1080p • 2024',
