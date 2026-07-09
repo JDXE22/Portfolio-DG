@@ -78,13 +78,14 @@ export const VIDEOS: Video[] = [
     meta: '1080p • 2026',
   },
   {
-    id: 'v14',
-    title: 'Soul work',
-    category: 'Editing',
-    youtubeId: 'rX6-EWSY1ro',
-    poster: '/posters/Soul-work.jpeg',
+    id: 'v15',
+    title: 'GA Heart 2026 Campaign',
+    category: 'Narrrative',
+    youtubeId: 'PRTJz6WCaQY',
+    poster: '/posters/GA_HEART_2026_Campaign.jpeg',
     meta: '1080p • 2024',
   },
+
   {
     id: 'v2',
     title: 'SSP America',
@@ -159,11 +160,11 @@ export const VIDEOS: Video[] = [
   },
 
   {
-    id: 'v15',
-    title: 'GA Heart 2026 Campaign',
-    category: 'Narrrative',
-    youtubeId: 'PRTJz6WCaQY',
-    poster: '/posters/GA_HEART_2026_Campaign.jpeg',
+    id: 'v14',
+    title: 'Soul work',
+    category: 'Editing',
+    youtubeId: 'rX6-EWSY1ro',
+    poster: '/posters/Soul-work.jpeg',
     meta: '1080p • 2024',
   },
 ];
