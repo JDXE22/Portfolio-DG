@@ -10,6 +10,10 @@ interface Props {
 }
 
 const { categories, videos, initialVisible } = Astro.props;
+
+const emptyCategories = categories.filter(
+  (cat) => cat !== 'All' && !videos.some((v) => v.category === cat)
+);
 ---
 
 <section
@@ -75,11 +79,87 @@ const { categories, videos, initialVisible } = Astro.props;
           </div>
         ))
       }
+      {
+        emptyCategories.map((cat, i) => (
+          <div role='listitem'>
+            <article
+              class='video-card scroll-reveal relative rounded-lg overflow-hidden flex flex-col justify-between p-5 md:p-6 aspect-video border border-[color-mix(in_srgb,var(--color-outline-variant)_20%,transparent)] cursor-default group'
+              data-category={cat}
+              data-hidden={videos.length + i >= initialVisible ? 'true' : 'false'}
+              style='background: var(--color-surface-container-lowest);'
+              aria-label={`${cat} — Content in progress`}>
+              <!-- Background subtle glow -->
+              <div
+                class='absolute inset-0 pointer-events-none opacity-40 group-hover:opacity-70 transition-opacity duration-500'
+                style='background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--color-primary) 12%, transparent) 0%, transparent 60%), radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--color-surface-container-high) 40%, transparent) 0%, transparent 60%);'
+                aria-hidden='true'>
+              </div>
+
+              <!-- Top bar -->
+              <div class='relative z-10 flex items-center justify-between gap-2'>
+                <span
+                  class='text-xs uppercase tracking-widest font-semibold px-2.5 py-1 rounded-sm border inline-block'
+                  style='color: var(--color-primary); border-color: color-mix(in srgb, var(--color-primary) 30%, transparent); background: color-mix(in srgb, var(--color-primary) 8%, transparent); letter-spacing: 0.15em;'>
+                  {cat}
+                </span>
+                <div
+                  class='w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center border border-[color-mix(in_srgb,var(--color-primary)_20%,transparent)]'
+                  style='background: color-mix(in srgb, var(--color-surface-container) 80%, transparent);'
+                  aria-hidden='true'>
+                  <svg
+                    width='16'
+                    height='16'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    stroke-width='1.5'
+                    stroke-linecap='round'
+                    stroke-linejoin='round'
+                    style='color: var(--color-primary);'>
+                    <path d='M23 7l-7 5 7 5V7z'></path>
+                    <rect x='1' y='5' width='15' height='14' rx='2' ry='2'></rect>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Middle section -->
+              <div class='relative z-10 my-auto py-2'>
+                <h3 class='font-display text-base md:text-lg font-semibold text-on-surface leading-snug'>
+                  Content in Progress
+                </h3>
+                <p
+                  class='text-xs md:text-sm leading-relaxed mt-1 line-clamp-2'
+                  style='color: var(--color-on-surface-variant);'>
+                  Cinematography work for {cat} is currently being worked on and will be available soon.
+                </p>
+              </div>
+
+              <!-- Bottom status footer -->
+              <div
+                class='relative z-10 flex items-center gap-2 pt-3 border-t border-[color-mix(in_srgb,var(--color-outline-variant)_15%,transparent)]'>
+                <span class='relative flex h-2 w-2'>
+                  <span
+                    class='animate-ping absolute inline-flex h-full w-full rounded-full opacity-75'
+                    style='background-color: var(--color-primary);'></span>
+                  <span
+                    class='relative inline-flex rounded-full h-2 w-2'
+                    style='background-color: var(--color-primary);'></span>
+                </span>
+                <span
+                  class='text-[10px] md:text-xs uppercase tracking-widest font-medium'
+                  style='color: var(--color-on-surface-variant); letter-spacing: 0.15em;'>
+                  In Development • Coming Soon
+                </span>
+              </div>
+            </article>
+          </div>
+        ))
+      }
     </div>
 
     <!-- View All -->
     {
-      videos.length > initialVisible && (
+      videos.length + emptyCategories.length > initialVisible && (
         <div class='mt-10 text-center scroll-reveal'>
           <Button
             variant='secondary'
